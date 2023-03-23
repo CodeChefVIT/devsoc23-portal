@@ -17,3 +17,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@layer base{
+  @font-face {
+    font-family: 'Metropolis';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Metropolis Regular'), url('../styles/Metropolis-Regular.woff') format('woff');
+    }
+}

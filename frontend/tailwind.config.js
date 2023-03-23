@@ -3,7 +3,12 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
 
   theme: {
-    extend: {},
+    extend: {
+      fontFamily : {
+        spacegrostesk: ['Space Grotesk'],
+        metropolis: ['Metropolis']
+      },
+    },
   },
   plugins: [],
 };
