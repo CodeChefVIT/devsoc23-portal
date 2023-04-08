@@ -2,18 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
 body {
   background-color: #242e42;
   color: #fff;
 }
-=======
-@layer base{
-    @font-face {
-      font-family: 'Metropolis';
-      font-style: normal;
-      font-weight: normal;
-      src: local('Metropolis Regular'), url('../styles/Metropolis-Regular.woff') format('woff');
-      }
+
+.form-error {
+  color: rgb(255, 4, 4);
+}
+
+@layer base {
+  @font-face {
+    font-family: "Metropolis";
+    font-style: normal;
+    font-weight: normal;
+    src: local("Metropolis Regular"),
+      url("../styles/Metropolis-Regular.woff") format("woff");
   }
->>>>>>> 0159ea6f647fbe4b1d44babf3700347e1348005c
+}

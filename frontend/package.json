@@ -22,15 +22,11 @@
     "next": "^13.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-<<<<<<< HEAD
     "react-helmet": "^6.1.0",
     "react-icons": "^4.8.0",
     "styled-components": "^5.3.9",
     "yup": "^1.0.2",
-    "zod": "^3.20.6"
-=======
     "zod": "^3.21.4"
->>>>>>> 0159ea6f647fbe4b1d44babf3700347e1348005c
   },
   "devDependencies": {
     "@types/eslint": "^8.21.1",
