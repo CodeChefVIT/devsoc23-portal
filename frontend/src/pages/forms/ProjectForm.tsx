@@ -65,8 +65,8 @@ const ProjectForm = () => {
       })
       .max(15, { message: "Project name cannot be more than 15 characters" }),
     projectTrack: z
-      .literal("Track 1")
-      .or(z.literal("Track 2"))
+      .literal("Finance")
+      .or(z.literal("Healthcare"))
       .or(z.literal("Track 3")),
     projectTagLine: z
       .string({
@@ -157,7 +157,7 @@ const ProjectForm = () => {
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      console.log(values);
+      submitProject(values);
     },
     validationSchema: toFormikValidationSchema(projectSchema),
     validateOnChange: true,
@@ -186,7 +186,7 @@ const ProjectForm = () => {
             <p className="text-4xl">Post your Project</p>
           </div>
           <div className="border-[2px] border-[#37ABBC]" />
-          <form className="px-[2rem] md:px-[8rem]">
+          <form className="px-[2rem] md:px-[8rem]" onSubmit={formik.handleSubmit}>
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* projectName */}
               <div className="col-span-4">
