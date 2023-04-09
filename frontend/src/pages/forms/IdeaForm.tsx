@@ -1,8 +1,146 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { z } from "zod";
+import Router from "next/router";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { render } from "react-dom";
+import getToken from "~/utils/GetAccessToken";
 
 const IdeaForm = () => {
+  const initialValues = {
+    projectName: "",
+    projectTrack: "Select a track",
+    projectDescription: "",
+    projectFigmaLink: "",
+    projectDriveLink: "",
+  };
+  const [loading, setLoading] = useState(true);
+  const [firstTime, setFirstTime] = useState(true);
+  var accessToken = "";
+
+  const getProject = async () => {
+    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    try {
+      accessToken = await getToken();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await response.json();
+      if (data.status === "true") {
+        formik.setValues({
+          projectName: data.project.projectName,
+          projectTrack: data.project.projectTrack,
+          projectDescription: data.project.projectDescription,
+          projectFigmaLink: data.project.projectFigmaLink,
+          projectDriveLink: data.project.projectDriveLink,
+        });
+        setFirstTime(false);
+        setLoading(false);
+      } else {
+        setFirstTime(true);
+        setLoading(false);
+      }
+    } catch (err) {
+      Router.push("../");
+    }
+  };
+
+  const projectSchema = z.object({
+    projectName: z
+      .string({
+        required_error: "Project name is required",
+        invalid_type_error: "Project name must be a string",
+      })
+      .max(15, { message: "Project name cannot be more than 15 characters" }),
+    projectTrack: z
+      .literal("Finance")
+      .or(z.literal("Healthcare"))
+      .or(z.literal("Track 3")),
+    projectDescription: z
+      .string({
+        required_error: "Project description is required",
+        invalid_type_error: "Project description must be a string",
+      })
+      .min(100, {
+        message: "Description should be between 100 to 500 characters",
+      })
+      .max(500, {
+        message: "Description should be between 100 to 500 characters",
+      }),
+    projectFigmaLink: z
+      .string({
+        required_error: "Figma link is required",
+        invalid_type_error: "Figma link must be a string",
+      })
+      .url({ message: "Please enter a valid url" })
+      .includes("figma.com", { message: "Please enter a figma link" }),
+    projectDriveLink: z
+      .string({
+        required_error: "Google Drive link is required",
+        invalid_type_error: "Google Drive link must be a string",
+      })
+      .url({ message: "Please enter a valid url" })
+      .includes("google.com", {
+        message: "Please enter a google drive link",
+      }),
+  });
+
+  const submitProject = async (values: {
+    projectName: string;
+    projectTrack: string;
+    projectDescription: string;
+    projectFigmaLink: string;
+    projectDriveLink: string;
+  }) => {
+    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
+      firstTime ? "idea" : "update"
+    }`;
+    try {
+      accessToken = await getToken();
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+      if (data.status === "true") {
+        console.log("Success");
+      } else {
+        console.log("Error");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: (values) => {
+      submitProject(values);
+    },
+    validationSchema: toFormikValidationSchema(projectSchema),
+    validateOnChange: true,
+    enableReinitialize: true,
+  });
+
+  // const formChecker = () => {
+    
+
+
+  useEffect(() => {
+    getProject();
+  }, []);
+
   return (
     <>
       <Head>
@@ -10,238 +148,222 @@ const IdeaForm = () => {
         <meta name="description" content="Idea Submission for DEVSOC'23" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="bg-[#242E42] text-white">
-        <div className="px-[2rem] pt-[4rem] pb-4 md:px-[8rem]">
-          <p className="text-4xl">Post your Idea</p>
-        </div>
-        <div className="border-[2px] border-[#37ABBC]" />
-        <form className="px-[2rem] md:px-[8rem]">
-          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div className="col-span-4">
-              <label
-                htmlFor="ideaName"
-                className="text-md block pb-1 font-medium leading-6"
-              >
-                Name of your idea*
-              </label>
-              <div className="mt-2 flex rounded-lg shadow-sm">
-                <input
-                  type="text"
-                  name="ideaName"
-                  id="ideaName"
-                  placeholder="Enter your idea name"
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="col-span-3">
-              <label
-                htmlFor="track"
-                className="text-md block font-medium leading-6"
-              >
-                Track
-              </label>
-              <div className="col-span-3 mt-2">
-                <select
-                  id="track"
-                  name="track"
-                  defaultValue={"Select a track"}
-                  className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+      {loading && (
+        <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
+          Loading...
+        </main>
+      )}
+      {!loading && (
+        <main className="bg-[#242E42] text-white">
+          <div className="px-[2rem] pt-[4rem] pb-4 md:px-[8rem]">
+            <p className="text-4xl">Post your Idea</p>
+          </div>
+          <div className="border-[2px] border-[#37ABBC]" />
+          <form
+            className="px-[2rem] md:px-[8rem]"
+            onSubmit={formik.handleSubmit}
+          >
+            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              {/* projectName */}
+              <div className="col-span-4">
+                <label
+                  htmlFor="projectName"
+                  className="text-md block pb-1 font-medium leading-6"
                 >
-                  <option disabled>Select a track</option>
-                  <option>Track 1</option>
-                  <option>Track 2</option>
-                  <option>Track 3</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="col-span-4">
-              <label
-                htmlFor="ideaTagline"
-                className="text-md block pb-1 font-medium leading-6"
-              >
-                Tagline of your idea*
-              </label>
-              <div className="mt-2 flex rounded-lg shadow-sm">
-                <input
-                  type="text"
-                  name="ideaTagline"
-                  id="ideaTagline"
-                  placeholder="Give a catchy tagline for your idea"
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="col-span-4">
-              <label
-                htmlFor="plannedFrameworks"
-                className="text-md block pb-1 font-medium leading-6"
-              >
-                Frameworks you plan to use*
-              </label>
-              <div className="mt-2 flex rounded-lg shadow-sm">
-                <input
-                  type="text"
-                  name="builtWith"
-                  id="builtWith"
-                  placeholder="Languages, frameworks, platforms, cloudservices, APIs, etc."
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="col-span-4">
-              <label
-                htmlFor="aboutidea"
-                className="text-md -mb-1 block font-medium leading-6"
-              >
-                About your idea*
-              </label>
-              <p className="mt-2 pb-2 text-sm text-gray-300">
-                Don't forget to include your inspiration, learnings, idea
-                construction method, and difficulties you encountered in your
-                writing.
-              </p>
-              <div className="mt-2">
-                <textarea
-                  id="aboutidea"
-                  name="aboutidea"
-                  placeholder="Write a brief description of your idea"
-                  rows={20}
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  defaultValue={""}
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-4">
-              <label
-                htmlFor="imageGallery"
-                className="text-md -mb-1 block font-medium leading-6"
-              >
-                Image Gallery*
-              </label>
-              <p className="mt-2 pb-2 text-sm text-gray-300">
-                JPG, PNG or GIF format, 5 MB max file size.
-              </p>
-              <div className="mt-2 flex justify-center rounded-md border-2 border-dashed border-[#37ABBC] px-6 pt-5 pb-6">
-                <div className="space-y-1 py-4 text-center">
-                  <div className="flex text-sm">
-                    <label
-                      htmlFor="imageGallery"
-                      className="relative mx-auto cursor-pointer rounded-md bg-[#37ABBC] p-2 font-medium focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-[#288391]"
-                    >
-                      <span>Choose files</span>
-                      <input
-                        id="imageGallery"
-                        name="imageGallery"
-                        type="file"
-                        className="sr-only"
-                        multiple
-                      />
-                    </label>
-                  </div>
-                  <p className="pl-1 text-gray-300">or drag and drop</p>
+                  Name of your project*
+                </label>
+                <div className="mt-2 flex rounded-lg shadow-sm">
+                  <input
+                    required
+                    type="text"
+                    name="projectName"
+                    id="projectName"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.projectName}
+                    placeholder="Enter your project name"
+                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                      formik.touched.projectName && formik.errors.projectName
+                        ? "border-2 border-red-500"
+                        : ""
+                    }`}
+                  />
                 </div>
+                <label htmlFor="projectName" className="text-sm text-red-500">
+                  {formik.touched.projectName && formik.errors.projectName}
+                </label>
               </div>
-            </div>
 
-            <div className="col-span-4">
-              <label
-                htmlFor="githublink"
-                className="text-md -mb-1 block font-medium leading-6"
-              >
-                GitHub Link*
-              </label>
-              <p className="mt-2 pb-1 text-sm text-gray-300">
-                Make sure your repository is public.
-              </p>
-              <div className="mt-2 flex rounded-lg shadow-sm">
-                <input
-                  type="text"
-                  name="githublink"
-                  id="githublink"
-                  placeholder="Share the link to your GitHub repository"
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="col-span-4">
-              <label
-                htmlFor="figmalink"
-                className="text-md -mb-1 block font-medium leading-6"
-              >
-                Figma Link*
-              </label>
-              <p className="mt-2 pb-1 text-sm text-gray-300">
-                Make sure to give viewing permissions.
-              </p>
-              <div className="mt-2 flex rounded-lg shadow-sm">
-                <input
-                  type="text"
-                  name="figmalink"
-                  id="figmalink"
-                  placeholder="Share the link to your Figma file"
-                  className="block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-              </div>
-            </div>
-
-            <div className="sm:col-span-4">
-              <label
-                htmlFor="extradocs"
-                className="text-md -mb-1 block font-medium leading-6"
-              >
-                Any Other Documents?
-              </label>
-              <p className="mt-2 pb-2 text-sm text-gray-300">
-                Images, PDFs, Documents, etc. 5 MB max file size.
-              </p>
-              <div className="mt-2 flex justify-center rounded-md border-2 border-dashed border-[#37ABBC] px-6 pt-5 pb-6">
-                <div className="space-y-1 py-4 text-center">
-                  <div className="flex text-sm">
-                    <label
-                      htmlFor="extradocs"
-                      className="relative mx-auto cursor-pointer rounded-md bg-[#37ABBC] p-2 font-medium focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:bg-[#288391]"
-                    >
-                      <span>Choose files</span>
-                      <input
-                        id="extradocs"
-                        name="extradocs"
-                        type="file"
-                        className="sr-only"
-                        multiple
-                      />
-                    </label>
-                  </div>
-                  <p className="pl-1 text-gray-300">or drag and drop</p>
+              {/* projectTrack */}
+              <div className="col-span-3">
+                <label
+                  htmlFor="projectTrack"
+                  className="text-md block font-medium leading-6"
+                >
+                  Track*
+                </label>
+                <div className="col-span-3 mt-2">
+                  <select
+                    id="projectTrack"
+                    name="projectTrack"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.projectTrack}
+                    className={`block rounded-md py-1.5 text-gray-900 sm:text-sm sm:leading-6 ${
+                      formik.touched.projectTrack && formik.errors.projectTrack
+                        ? "border-b-2 border-red-500"
+                        : ""
+                    }`}
+                  >
+                    <option disabled>Select a track</option>
+                    <option>Finance</option>
+                    <option>Healthcare</option>
+                    <option>Track 3</option>
+                  </select>
                 </div>
+                <label htmlFor="projectTrack" className="text-sm text-red-500">
+                  {formik.touched.projectTrack && formik.errors.projectTrack}
+                </label>
+              </div>
+
+              {/* projectDescription */}
+              <div className="col-span-4">
+                <label
+                  htmlFor="projectDescription"
+                  className="text-md -mb-1 block font-medium leading-6"
+                >
+                  About your project*
+                </label>
+                <p className="mt-2 pb-2 text-sm text-gray-300">
+                  Don&apos;t forget to include your inspiration, learnings,
+                  project construction method, and difficulties you encountered
+                  in your writing.
+                </p>
+                <div className="mt-2">
+                  <textarea
+                    id="projectDescription"
+                    name="projectDescription"
+                    placeholder="Write a brief description of your project"
+                    rows={20}
+                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                      formik.touched.projectDescription &&
+                      formik.errors.projectDescription
+                        ? "border-2 border-red-500"
+                        : ""
+                    }`}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.projectDescription}
+                  />
+                </div>
+                <label
+                  htmlFor="projectDescription"
+                  className="text-sm text-red-500"
+                >
+                  {formik.touched.projectDescription &&
+                    formik.errors.projectDescription}
+                </label>
+              </div>
+
+              {/* projectFigmaLink */}
+              <div className="col-span-4">
+                <label
+                  htmlFor="projectFigmaLink"
+                  className="text-md -mb-1 block font-medium leading-6"
+                >
+                  Figma Link*
+                </label>
+                <p className="mt-2 pb-1 text-sm text-gray-300">
+                  Make sure to give viewing permissions (Enter NA if not
+                  available).
+                </p>
+                <div className="mt-2 flex rounded-lg shadow-sm">
+                  <input
+                    required
+                    type="text"
+                    name="projectFigmaLink"
+                    id="projectFigmaLink"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.projectFigmaLink}
+                    placeholder="https://www.figma.com/example"
+                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                      formik.touched.projectFigmaLink &&
+                      formik.errors.projectFigmaLink
+                        ? "border-2 border-red-500"
+                        : ""
+                    }`}
+                  />
+                </div>
+                <label
+                  htmlFor="projectFigmaLink"
+                  className="text-sm text-red-500"
+                >
+                  {formik.touched.projectFigmaLink &&
+                    formik.errors.projectFigmaLink}
+                </label>
+              </div>
+
+              {/* projectDriveLink */}
+              <div className="col-span-4">
+                <label
+                  htmlFor="projectDriveLink"
+                  className="text-md -mb-1 block font-medium leading-6"
+                >
+                  Any Other Documents?
+                </label>
+                <p className="mt-2 pb-1 text-sm text-gray-300">
+                  Upload everything to a Google Drive folder and share the link
+                  (Enter NA if not available).
+                </p>
+                <div className="mt-2 flex rounded-lg shadow-sm">
+                  <input
+                    required
+                    type="text"
+                    name="projectDriveLink"
+                    id="projectDriveLink"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.projectDriveLink}
+                    placeholder="https://www.google.com/drive/example"
+                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                      formik.touched.projectDriveLink &&
+                      formik.errors.projectDriveLink
+                        ? "border-2 border-red-500"
+                        : ""
+                    }`}
+                  />
+                </div>
+                <label
+                  htmlFor="projectDriveLink"
+                  className="text-sm text-red-500"
+                >
+                  {formik.touched.projectDriveLink &&
+                    formik.errors.projectDriveLink}
+                </label>
               </div>
             </div>
-          </div>
 
-          <div className="py-10">
-            <div className="flex justify-start">
-              <button
-                type="submit"
-                className="text-md rounded-md bg-[#37ABBC] py-3 px-10 font-semibold text-white shadow-sm hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Save Changes
-              </button>
-              <button
-                type="button"
-                className="text-md ml-3 rounded-md border border-gray-300 bg-transparent py-3 px-10 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391]"
-              >
-                Cancel
-              </button>
+            <div className="py-10">
+              <div className="flex justify-start">
+                <button
+                  disabled={formik.isSubmitting}
+                  type="submit"
+                  className="text-md rounded-md bg-[#37ABBC] py-3 px-7 font-semibold text-white shadow-sm hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  className="text-md ml-3 rounded-md border border-gray-300 bg-transparent py-3 px-10 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391]"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>
-        </form>
-      </main>
+          </form>
+        </main>
+      )}
     </>
   );
 };
