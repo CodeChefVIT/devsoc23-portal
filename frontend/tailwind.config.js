@@ -2,7 +2,12 @@
 const config = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily : {
+        spacegrostesk: ['Space Grotesk'],
+        metropolis: ['Metropolis']
+      },
+    },
   },
   plugins: [require('@tailwindcss/forms')],
 };
