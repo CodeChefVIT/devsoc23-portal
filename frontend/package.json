@@ -9,10 +9,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "formik": "^2.2.9",
     "next": "^13.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "zod-formik-adapter": "^1.2.0",
+    "zod-validation-error": "^1.2.1"
   },
   "devDependencies": {
     "@types/eslint": "^8.21.1",
