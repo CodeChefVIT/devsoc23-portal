@@ -5,59 +5,61 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { IconContext } from "react-icons";
 import FormData from "form-data";
 import { useFormik } from "formik";
+import { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { z } from "zod";
 import * as Yup from "yup";
-
-const initialValues = {
-  first_name: "",
-  last_name: "",
-  about: "",
-  email: "",
-  password: "",
-  phone_number: "",
-  gender: "",
-  college_name: "",
-  dob: "",
-};
-
-// type FormData = {
-//   first_name: string;
-//   last_name: string;
-//   about: string;
-//   email: string;
-//   password: string;
-//   phone_number: string;
-//   gender: string;
-//   college_name: string;
-//   dob: string;
-// };
+import router from "next/router";
+import getToken from "../utils/GetAccessToken";
 
 function Portal() {
-  // const schema = z.object({
-  //   first_name: z
-  //     .string()
-  //     .min(2)
-  //     .max(20)
-  //     .refine((i) => i.length <= 25, {
-  //       message: "Please enter a First Name",
-  //     }),
-  //   last_name: z.string().min(2).max(20),
-  //   about: z.string().min(2).max(300),
-  //   email: z.string().email(),
-  //   password: z.string().min(8).max(20),
-  //   phone_number: z.string().min(10).max(10),
-  //   gender: z.string(),
-  //   college_name: z.string().min(2).max(20),
-  //   dob: z.string(),
-  // });
+  const initialValues = {
+    first_name: "",
+    last_name: "",
+    about: "",
+    email: "",
+    password: "",
+    phone_number: "",
+    gender: "",
+    college_name: "",
+    dob: "",
+  };
+  const [loading, setLoading] = useState(true);
+  var accessToken = "";
+  const [dob, setValue] = React.useState<Dayjs | null>(null);
 
-  // const validateFormData = (inputs: unknown) => {
-  //   const isValidData = schema.safeParse(inputs);
-  //   return isValidData;
-  // };
+  const getUser = async () => {
+    let url = "http://localhost:3000/users/get";
+    try {
+      accessToken = await getToken();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {},
+      });
+      const data = await response.json();
+      if (data.status) {
+        Formik.setValues({
+          first_name: data.data.first_name,
+          last_name: data.data.last_name,
+          about: data.data.about,
+          email: data.data.email,
+          password: data.data.password,
+          phone_number: data.data.phone_number,
+          gender: data.data.gender,
+          college_name: data.data.college_name,
+          dob: data.data.dob,
+        });
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+      Router.push("../");
+    }
+  };
 
   const portalSchema = Yup.object({
     first_name: Yup.string()
@@ -83,7 +85,39 @@ function Portal() {
     //dob: Yup.string().required("Please enter a valid Date of Birth"),
   });
 
-  const [value, setValue] = React.useState<Dayjs | null>(null);
+  const submitUser = async (values: {
+    first_name: string;
+    last_name: string;
+    about: string;
+    email: string;
+    password: string;
+    phone_number: string;
+    gender: string;
+    college_name: string;
+    dob: string;
+  }) => {
+    let url = "http://localhost:3000/users/update";
+    try {
+      accessToken = await getToken();
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+      if (data.status === "true") {
+        console.log("Success");
+      } else {
+        console.log("Error");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const [selectedFile, setSelectedFile] = useState();
   const [preview, setPreview] = useState();
 
@@ -142,6 +176,10 @@ function Portal() {
       },
     });
   console.log(errors);
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   // const submitData = (values: FormData) => {
   //   console.log("It worked", values);
@@ -464,11 +502,16 @@ function Portal() {
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       dateAdapter={AdapterDayjs}
                     >
-                      <DatePicker format="DD-MM-YYYY" />
+                      <DatePicker
+                        format="DD-MM-YYYY"
+                        value={dob}
+                        onChange={(newValue) => setValue(newValue)}
+                        //onBlur={handleBlur}
+                      />
                     </LocalizationProvider>
-                    {errors.dob && touched.dob ? (
+                    {/* {errors.dob && touched.dob ? (
                       <span className="form-error">{errors.dob}</span>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 </div>
               </div>
