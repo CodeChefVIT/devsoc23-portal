@@ -8,6 +8,10 @@ const config = {
         metropolis: ['Metropolis']
       },
     },
+    screens: {
+      'xl': {'max': '1400px'},
+    }
+
   },
   plugins: [],
 };

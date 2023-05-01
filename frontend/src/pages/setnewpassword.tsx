@@ -12,7 +12,6 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
-
   const router = useRouter();
 
   const validateSchema = z.object({
@@ -43,18 +42,26 @@ export default function Home() {
       axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, { email: localStorage.getItem("email"), otp: formik.values.otp, password: formik.values.password })
         .then((e) => {
           const status = e.data.status
-          if (status === 'fail') {
+          if (status === 'false') {
             setSuccessSnack(false)
-            showSnackbar(e.data.err, 800);
+            showSnackbar(e.data.err, 1500);
           }
           else {
             setSuccessSnack(true)
-            showSnackbar("Password Changed Successfully", 1000);
-            router.push("/signin")
+            showSnackbar("Password Changed Successfully", 1500);
+            setTimeout(function () {
+              router.push("/signin")
+            }, 1500);
           }
         })
         .catch((e) => {
-          console.log(e)
+          setSuccessSnack(false)
+          if (e.message != "Request failed with status code 400") {
+            showSnackbar(e.message, 1500);
+          }
+          else {
+            showSnackbar(e.response.data.err, 1500);
+          }
         })
     }
   })
@@ -86,9 +93,11 @@ export default function Home() {
           <img src="astro.png" className={styles.astro} />
           <img src="mars.png" className={styles.mars} />
         </div>
-      </div>
-      <div id="snackbar" className={`w-fit (${sucessSnack} ? bg-green-400 : bg-red-100) (${sucessSnack} ? border-green-800 : border-red-400) (${sucessSnack} ? text-black-700 : text-red-700) border px-4 py-3 rounded transition invisible absolute bottom-4 left-4`} role='alert'>
-        Snackbar message here.
+        {sucessSnack ? <div id="snackbar" className={"w-fit h-fit bg-green-400 border-green-800 text-black-700 border px-4 py-3 rounded transition invisible fixed bottom-4 left-4"} role='alert'>
+          Snackbar message here.
+        </div> : <div id="snackbar" className={"w-fit h-fit bg-red-100 border-red-400 text-red-700 border px-4 py-3 rounded transition invisible fixed bottom-4 left-4"} role='alert'>
+          Snackbar message here.
+        </div>}
       </div>
     </>
   )
