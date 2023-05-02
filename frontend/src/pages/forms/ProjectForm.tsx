@@ -5,7 +5,6 @@ import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Router from "next/router";
-import { fromZodError } from "zod-validation-error";
 import getToken from "~/utils/GetAccessToken";
 
 const ProjectForm = () => {
@@ -21,10 +20,14 @@ const ProjectForm = () => {
     projectDriveLink: "",
   };
   const [loading, setLoading] = useState(true);
-  var accessToken = "";
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
+  let accessToken = "";
 
   const getProject = async () => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
@@ -36,7 +39,7 @@ const ProjectForm = () => {
       });
       const data = await response.json();
       if (data.status) {
-        formik.setValues({
+        void formik.setValues({
           projectName: data.project.projectName,
           projectTrack: data.project.projectTrack,
           projectTagLine: data.project.projectTagLine,
@@ -53,7 +56,7 @@ const ProjectForm = () => {
         setLoading(false);
       }
     } catch (err) {
-      Router.push("../");
+      void Router.push("../");
     }
   };
 
@@ -132,10 +135,10 @@ const ProjectForm = () => {
     projectVideoLink: string;
     projectDriveLink: string;
   }) => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/update`;
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/update`;
     try {
       accessToken = await getToken();
-      const response = await fetch(url, { 
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,20 +147,30 @@ const ProjectForm = () => {
         body: JSON.stringify(values),
       });
       const data = await response.json();
-      if (data.status==='true') {
-        console.log("Success");
+      if (data.status === "true") {
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(true);
+        setMessage("Changes save successfully");
       } else {
-        console.log("Error");
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(false);
+        setMessage("Something went wrong. Please try again later");
       }
     } catch (err) {
-      console.log(err);
+      setIsSubmitting(false);
+      setIsOpen(true);
+      setIsSuccess(false);
+      setMessage("Something went wrong. Please try again later");
     }
   };
 
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      submitProject(values);
+      setIsSubmitting(true);
+      void submitProject(values);
     },
     validationSchema: toFormikValidationSchema(projectSchema),
     validateOnChange: true,
@@ -165,7 +178,8 @@ const ProjectForm = () => {
   });
 
   useEffect(() => {
-    getProject();
+    void getProject();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -186,7 +200,10 @@ const ProjectForm = () => {
             <p className="text-4xl">Post your Project</p>
           </div>
           <div className="border-[2px] border-[#37ABBC]" />
-          <form className="px-[2rem] md:px-[8rem]" onSubmit={formik.handleSubmit}>
+          <form
+            className="px-[2rem] md:px-[8rem]"
+            onSubmit={formik.handleSubmit}
+          >
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* projectName */}
               <div className="col-span-4">
@@ -559,6 +576,46 @@ const ProjectForm = () => {
               </div>
             </div>
           </form>
+          {isOpen && (
+            <div
+              className={`rounded-md ${
+                isSuccess ? "bg-green-100" : "bg-red-50"
+              } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+            >
+              <div className="flex items-center">
+                <div className="mr-3">
+                  <div
+                    className={`text-sm ${
+                      isSuccess ? "text-green-700" : "text-red-700"
+                    }`}
+                  >
+                    <p>{message}</p>
+                  </div>
+                </div>
+                <button
+                  className="flex-shrink-0"
+                  onClick={() => {
+                    setIsOpen(false);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke={`${isSuccess ? "green" : "red"}`}
+                    className="h-6 w-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       )}
     </>

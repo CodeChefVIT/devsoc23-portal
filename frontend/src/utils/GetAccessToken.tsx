@@ -1,12 +1,12 @@
 import Router from "next/router";
 
 const getToken = async () => {
-  let refreshToken = localStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) {
-    Router.push("../");
+    void Router.push("../");
     return false;
   }
-  let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/refresh`;
+  const url: string|undefined = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/refresh`;
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -21,11 +21,11 @@ const getToken = async () => {
     if (data.status === "true") {
       return data.accessToken;
     } else {
-      Router.push("../");
+      void Router.push("../");
     }
   } catch (err) {
     console.log(err);
-    Router.push("../");
+    void Router.push("../");
   }
 };
 
