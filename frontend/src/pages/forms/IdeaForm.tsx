@@ -119,18 +119,27 @@ const IdeaForm = () => {
         setIsSubmitting(false);
         setIsOpen(true);
         setIsSuccess(true);
-        setMessage("Changes save successfully");
+        setMessage("Changes saved successfully");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       } else {
         setIsSubmitting(false);
         setIsOpen(true);
         setIsSuccess(false);
         setMessage("Something went wrong. Please try again later");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       }
     } catch (err) {
       setIsSubmitting(false);
       setIsOpen(true);
       setIsSuccess(false);
       setMessage("Something went wrong. Please try again later");
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 2000);
     }
   };
 
