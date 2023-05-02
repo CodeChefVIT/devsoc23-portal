@@ -1,12 +1,9 @@
-import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import Router from "next/router";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { render } from "react-dom";
 import getToken from "~/utils/GetAccessToken";
 
 const IdeaForm = () => {
@@ -17,12 +14,17 @@ const IdeaForm = () => {
     projectFigmaLink: "",
     projectDriveLink: "",
   };
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
-  var accessToken = "";
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
+
+  let accessToken = "";
 
   const getProject = async () => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
@@ -34,7 +36,7 @@ const IdeaForm = () => {
       });
       const data = await response.json();
       if (data.status === "true") {
-        formik.setValues({
+        void formik.setValues({
           projectName: data.project.projectName,
           projectTrack: data.project.projectTrack,
           projectDescription: data.project.projectDescription,
@@ -48,7 +50,7 @@ const IdeaForm = () => {
         setLoading(false);
       }
     } catch (err) {
-      Router.push("../");
+      void Router.push("../");
     }
   };
 
@@ -99,7 +101,7 @@ const IdeaForm = () => {
     projectFigmaLink: string;
     projectDriveLink: string;
   }) => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
       firstTime ? "idea" : "update"
     }`;
     try {
@@ -114,19 +116,38 @@ const IdeaForm = () => {
       });
       const data = await response.json();
       if (data.status === "true") {
-        console.log("Success");
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(true);
+        setMessage("Changes saved successfully");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       } else {
-        console.log("Error");
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(false);
+        setMessage("Something went wrong. Please try again later");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       }
     } catch (err) {
-      console.log(err);
+      setIsSubmitting(false);
+      setIsOpen(true);
+      setIsSuccess(false);
+      setMessage("Something went wrong. Please try again later");
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 2000);
     }
   };
 
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      submitProject(values);
+      setIsSubmitting(true);
+      void submitProject(values);
     },
     validationSchema: toFormikValidationSchema(projectSchema),
     validateOnChange: true,
@@ -134,17 +155,16 @@ const IdeaForm = () => {
   });
 
   // const formChecker = () => {
-    
-
 
   useEffect(() => {
-    getProject();
+    void getProject();
+    // eslint-disable-next-line
   }, []);
 
   return (
     <>
       <Head>
-        <title>DEVSOC'23 | Idea Submission</title>
+        <title>DEVSOC&apos;23 | Idea Submission</title>
         <meta name="description" content="Idea Submission for DEVSOC'23" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -162,6 +182,7 @@ const IdeaForm = () => {
           <form
             className="px-[2rem] md:px-[8rem]"
             onSubmit={formik.handleSubmit}
+            noValidate
           >
             <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               {/* projectName */}
@@ -347,11 +368,15 @@ const IdeaForm = () => {
             <div className="py-10">
               <div className="flex justify-start">
                 <button
-                  disabled={formik.isSubmitting}
+                  disabled={isSubmitting}
                   type="submit"
-                  className="text-md rounded-md bg-[#37ABBC] py-3 px-7 font-semibold text-white shadow-sm hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className={`text-md rounded-md ${
+                    isSubmitting
+                      ? "bg-[#288391] text-gray-400"
+                      : "bg-[#37ABBC] text-white hover:bg-[#288391]"
+                  } py-3 px-7 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
                 >
-                  Save Changes
+                  {isSubmitting ? "Saving... " : "Save Changes"}
                 </button>
                 <button
                   type="button"
@@ -362,6 +387,41 @@ const IdeaForm = () => {
               </div>
             </div>
           </form>
+          {isOpen && (
+            <div
+            className={`rounded-md ${
+              isSuccess ? "bg-green-100" : "bg-red-50"
+            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+          >
+            <div className="flex items-center">
+              <div className="mr-3">
+                <div
+                  className={`text-sm ${
+                    isSuccess ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  <p>{message}</p>
+                </div>
+              </div>
+              <button className="flex-shrink-0" onClick={()=>{setIsOpen(false)}}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke={`${isSuccess ? "green" : "red"}`}
+                  className="h-6 w-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          )}
         </main>
       )}
     </>
