@@ -6,13 +6,20 @@ import { z } from 'zod'
 import { toFormikValidationSchema } from 'zod-formik-adapter';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
 
   const router = useRouter();
+
+  const checkEmail = () => {
+    const email = localStorage.getItem("email")
+    if(!email){
+      router.push("/")
+    }
+  }
 
   const validateSchema = z.object({
     otp: z.number({ required_error: "Required", invalid_type_error: "Enter valid OTP" }),
@@ -39,7 +46,7 @@ export default function Home() {
     },
     validationSchema: toFormikValidationSchema(validateSchema),
     onSubmit: async (e) => {
-      axios.patch(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, { email: localStorage.getItem("email"), otp: formik.values.otp, newpass: formik.values.password })
+      axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, { email: localStorage.getItem("email"), otp: formik.values.otp, newpass: formik.values.password })
         .then((e) => {
           console.log(e)
           const status = e.data.status
@@ -49,10 +56,13 @@ export default function Home() {
           }
           else {
             setSuccessSnack(true)
-            showSnackbar("Password Changed Successfully", 1500);
+            setTimeout(function() {
+              showSnackbar("Password Changed Successfully", 1500);
+            }, 0)
             setTimeout(function () {
+              localStorage.clear()
               router.push("/signin")
-            }, 1500);
+            }, 2000);
           }
         })
         .catch((e) => {
@@ -67,6 +77,13 @@ export default function Home() {
         })
     }
   })
+
+  useEffect(
+    () => {
+      checkEmail()
+    }, []
+  )
+
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
