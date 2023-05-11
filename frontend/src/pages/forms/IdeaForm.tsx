@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import Head from "next/head";
 import { useState, useEffect } from "react";
 import { z } from "zod";
@@ -27,7 +30,7 @@ const IdeaForm = () => {
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
-      const response = await fetch(url, {
+      const response: Response = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
