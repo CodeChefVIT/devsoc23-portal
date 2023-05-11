@@ -46,7 +46,7 @@ export default function Home() {
     },
     validationSchema: toFormikValidationSchema(validateSchema),
     onSubmit: async (e) => {
-      axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, { email: localStorage.getItem("email"), otp: formik.values.otp, newpass: formik.values.password })
+      axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, { email: localStorage.getItem("email"), otp: formik.values.otp.toString(), newpass: formik.values.password })
         .then((e) => {
           console.log(e)
           const status = e.data.status
