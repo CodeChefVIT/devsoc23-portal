@@ -18,18 +18,9 @@ export default function Home() {
     email: z.string({ required_error: "Required", invalid_type_error: "Email must be a string" }).email("Enter a valid email"),
   })
 
-  const [sucessSnack, setSuccessSnack] = useState(false)
-
-  const showSnackbar = (message, duration) => {
-    var snackbar = document.getElementById("snackbar");
-    snackbar.innerHTML = message;
-    snackbar.classList.add("visible");
-    snackbar.classList.remove("invisible");
-    setTimeout(function () {
-      snackbar.classList.remove("visible");
-      snackbar.classList.add("invisible");
-    }, duration);
-  }
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -41,14 +32,24 @@ export default function Home() {
         .then((e) => {
           const status = e.data.status
           if (status === 'false') {
-            setSuccessSnack(false)
-            showSnackbar(e.data.err, 1500);
+            setTimeout(() => {
+              setIsOpen(true)
+              setIsSuccess(false)
+              setMessage(e.data.err)
+            }, 0);
+            setTimeout(() => {
+              setIsOpen(false)
+            }, 1500);
           }
           else {
-            setSuccessSnack(true)
             setTimeout(function () {
-              showSnackbar(e.data.message, 1500);
+              setIsSuccess(true)
+              setIsOpen(true)
+              setMessage(e.data.message)
             }, 0);
+            setTimeout(function () {
+              setIsOpen(false)
+            }, 1500);
             setTimeout(function () {
               localStorage.setItem("email", formik.values.email)
               router.push("/setnewpassword")
@@ -56,12 +57,25 @@ export default function Home() {
           }
         })
         .catch((e) => {
-          setSuccessSnack(false)
           if (e.message != "Request failed with status code 400") {
-            showSnackbar(e.message, 1500);
+            setTimeout(() => {
+              setIsOpen(true)
+              setIsSuccess(false)
+              setMessage(e.message)
+            }, 0);
+            setTimeout(() => {
+              setIsOpen(false)
+            }, 1500);
           }
           else {
-            showSnackbar(e.response.data.err, 1500);
+            setTimeout(() => {
+              setIsOpen(true)
+              setIsSuccess(false)
+              setMessage(e.response.data.err)
+            }, 0);
+            setTimeout(() => {
+              setIsOpen(false)
+            }, 1500);
           }
         })
     }
@@ -91,11 +105,41 @@ export default function Home() {
           <img src="astro.png" className={styles.astro} />
           <img src="mars.png" className={styles.mars} />
         </div>
-        {sucessSnack ? <div id="snackbar" className={"w-fit h-fit bg-green-400 border-green-800 text-black-700 border px-4 py-3 rounded transition invisible fixed bottom-4 left-4"} role='alert'>
-          Snackbar message here.
-        </div> : <div id="snackbar" className={"w-fit h-fit bg-red-100 border-red-400 text-red-700 border px-4 py-3 rounded transition invisible fixed bottom-4 left-4"} role='alert'>
-          Snackbar message here.
-        </div>}
+        {isOpen && (
+            <div
+            className={`rounded-md ${
+              isSuccess ? "bg-green-100" : "bg-red-50"
+            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+          >
+            <div className="flex items-center">
+              <div className="mr-3">
+                <div
+                  className={`text-sm ${
+                    isSuccess ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  <p>{message}</p>
+                </div>
+              </div>
+              <button className="flex-shrink-0" onClick={()=>{setIsOpen(false)}}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke={`${isSuccess ? "green" : "red"}`}
+                  className="h-6 w-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          )}
       </div>
     </>
   )

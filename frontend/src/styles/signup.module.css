@@ -93,6 +93,11 @@
   -webkit-appearance: none;
   margin: 0;
 }
+.errorphonenumberinput::-webkit-outer-spin-button,
+.errorphonenumberinput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .bioinput{
     border-radius: 10px;
     height: 2.4rem;
