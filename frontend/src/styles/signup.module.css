@@ -1,6 +1,7 @@
 .maincontainer{
     display: flex;
     justify-content: space-between;
+    scroll-behavior: smooth;
 }
 .leftcontainer{
     border-left-width: 5px;
@@ -26,59 +27,179 @@
     font-weight: 200;
     font-size: 30px;
 }
-.formcontainer{
+.namescontainerform{
+    display: flex;
+    flex-direction: row;
+    margin-top: 3rem;
+}
+.biocontainer,.gendercontainer, .phonenumbercontainer{
     display: flex;
     flex-direction: column;
-}
-.formcontainer > label {
     margin-top: 1rem;
+}
+.personaldetailscontainer, .emailpasswordcontainer{
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+}
+.firstnamelabel,.emaillabel,.biolabel,.genderlabel,.collegenamelabel, .phonelabel{
     margin-left: 8rem;
     color: white;
     font-weight: 100;
     font-size: 20px;
 }
-.formcontainer > input {
+.lastnamelabel, .passwordlabel{
+    color: white;
+    font-weight: 100;
+    font-size: 20px;
+    margin-left: 2rem;
+}
+.educationlabel{
+    margin-left: 8rem;
+    color: white;
+    font-weight: 100;
+    font-size: 20px;
+    margin-top: 1rem;
+}
+.birthdaylabel{
+    color: white;
+    font-weight: 100;
+    font-size: 20px;
+    margin-left: 2rem;
+}
+.firstnameinput, .emailinput{
     border-radius: 10px;
     height: 2.4rem;
-    width: 30rem;
-    margin-left: 8rem;
-    margin-top: 0.2rem;
+    width: 20rem;
     padding: 0.8rem;
+    margin-left: 8rem;
+}
+.lastnameinput, .passwordinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 20rem;
+    padding: 0.8rem;
+    margin-left: 2rem;
+}
+.phonenumberinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 20rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+}
+.phonenumberinput::-webkit-outer-spin-button,
+.phonenumberinput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.errorphonenumberinput::-webkit-outer-spin-button,
+.errorphonenumberinput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.bioinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 42rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+}
+.genderinput{
+    border-radius: 10px;
+    height: fit-content;
+    width: 12rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+}
+.collegenameinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 15rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+}
+.birthdayinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 15rem;
+    padding: 0.8rem;
+    margin-left: 2rem;
+}
+.errorfirstnameinput, .erroremailinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 20rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+    border: solid red 2px;
+}
+.errorlastnameinput, .errorpasswordinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 20rem;
+    padding: 0.8rem;
+    border: solid red 2px;
+    margin-left: 2rem;
+}
+.errorphonenumberinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 20rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+    border: solid red 2px;
+}
+.errorbioinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 42rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+    border: solid red 2px;
+}
+.errorgenderinput{
+    border-radius: 10px;
+    height: fit-content;
+    width: 12rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+    border: solid red 2px;
+}
+.errorcollegenameinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 15rem;
+    padding: 0.8rem;
+    margin-left: 8rem;
+    border: solid red 2px;
+}
+.errorbirthdayinput{
+    border-radius: 10px;
+    height: 2.4rem;
+    width: 15rem;
+    padding: 0.8rem;
+    margin-left: 2rem;
+    border: solid red 2px;
 }
 .formcontainer > button {
     display: flex;
     justify-content: center;
     margin-left: 8rem;
-    margin-top: 1.2rem;
+    margin-top: 2rem;
     border-radius: 10px;
     padding: 0.3rem;
     width: 13rem;
     height: 2.1rem;
-}
-.googlesignincontainer{
-    display: flex;
-    flex-direction: column;
-}
-.googlesignincontainer > span {
-    margin-left: 8rem;
-    margin-top: 1.4rem;
-    color: white;
-    font-size: 18px;
-}
-.googlesignincontainer > button {
-    display: flex;
-    justify-content: center;
-    margin-left: 8rem;
-    margin-top: 0.8rem;
-    border-radius: 10px;
-    padding: 0.2rem;
-    width: 13rem;
+    margin-bottom: 1rem;
 }
 .rightcontainer {
     background-color: #20293C;
     width: 35%;
     overflow: hidden;
     height: 100vh;
+    position: fixed;
+    left: 65%;
 }
 .saturn{
     opacity: 40%;
@@ -137,35 +258,131 @@
         font-size: 120%;
     }
     .formcontainer{
-        align-items: center;
+        display: flex;
+        flex-direction: column;
     }
-    .formcontainer > label {
-        margin-top: 2%;
-        margin-left: 0;
-        font-size: 150%;
+    .namescontainerform{
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        margin-top: 0rem;
     }
-    .formcontainer > input {
+    .biocontainer,.gendercontainer,.phonenumbercontainer{
+        display: flex;
+        flex-direction: column;
+        margin-top: 0rem;
+        align-content: center;
+    }
+    .personaldetailscontainer, .emailpasswordcontainer{
+        display: flex;
+        flex-direction: column;
+        margin-top: 0rem;
+        align-content: center;
+    }
+    .firstnamelabel,.emaillabel,.biolabel,.genderlabel,.collegenamelabel,.phonelabel{
+        margin-left: 0rem;
+        align-self: center;
+        margin-top: 1rem;
+    }
+    .lastnamelabel,.passwordlabel{
+        margin-left: 0rem;
+        align-self: center;
+        margin-top: 1rem;
+    }
+    .educationlabel{
+        margin-left: 0rem;
+        margin-top: 0rem;
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    .birthdaylabel{
+        margin-top: 0rem;
+        margin-left: 0rem;
+        align-self: center;
+        margin-top: 1rem;
+    }
+    .firstnameinput, .emailinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .lastnameinput, .passwordinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .phonenumberinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .bioinput{
+        margin-left: 0rem;
         width: 20rem;
-        margin: 0;
+        align-self: center;
+    }
+    .genderinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .collegenameinput{
+        width: 20rem;
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .birthdayinput{
+        width: 20rem;
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorfirstnameinput, .erroremailinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorlastnameinput, .errorpasswordinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorphonenumberinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorbioinput{
+        width: 20rem;
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorgenderinput{
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorcollegenameinput{
+        width: 20rem;
+        margin-left: 0rem;
+        align-self: center;
+    }
+    .errorbirthdayinput{
+        width: 20rem;
+        margin-left: 0rem;
+        align-self: center;
     }
     .formcontainer > button {
-        margin-left: 0;
-    }
-    .googlesignincontainer{
-        align-items: center;
-    }
-    .googlesignincontainer > span {
-        margin-left: 0;
-    }
-    .googlesignincontainer > button {
-        margin-left: 0;
+        margin-left: 0rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        align-self: center;
     }
     .rightcontainer{
         display: none;
     }
   }
-  @media only screen and (max-height: 575px) {
+@media only screen and (max-height: 420px) {
     .leftcontainer{
         height: fit-content;
+    }
+}
+@media only screen and (max-height: 1100px) {
+    .leftcontainer{
+        height: 100%;
     }
 }
