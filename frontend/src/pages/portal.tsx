@@ -1,120 +1,177 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { useState, useRef, useEffect } from "react";
 import React from "react";
-import ReactDOM from "react-dom";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { IconContext } from "react-icons";
 import FormData from "form-data";
-import { useFormik } from "formik";
-import { Dayjs } from "dayjs";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useFormik, useFormikContext } from "formik";
+import { type Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { z } from "zod";
 import * as Yup from "yup";
-import router from "next/router";
-import getToken from "../utils/GetAccessToken";
+import Router from "next/router";
+import getToken from "~/utils/GetAccessToken";
+
+interface Values {
+  firstName: string;
+  lastName: string;
+  bio: string;
+  email: string;
+  //password: string;
+  phoneNumber: string;
+  gender: string;
+  college: string;
+  dob: string;
+}
 
 function Portal() {
-  const initialValues = {
-    first_name: "",
-    last_name: "",
-    about: "",
+  const initialValues: Values = {
+    firstName: "",
+    lastName: "",
+    bio: "",
     email: "",
-    password: "",
-    phone_number: "",
+    //password: "",
+    phoneNumber: "",
     gender: "",
-    college_name: "",
+    college: "",
     dob: "",
   };
   const [loading, setLoading] = useState(true);
-  var accessToken = "";
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
+
+  let accessToken = "";
   const [dob, setValue] = React.useState<Dayjs | null>(null);
 
+  const portalSchema = Yup.object({
+    firstName: Yup.string()
+      .min(2)
+      .max(25)
+      .required("Please enter a First Name"),
+    lastName: Yup.string().min(2).max(25).required("Please enter a Last Name"),
+    bio: Yup.string().min(2).max(300).required("Please enter a valid bio"),
+    email: Yup.string().email().required("Please enter a valid Email"),
+    // password: Yup.string()
+    //   .min(6)
+    //   .max(20)
+    //   .required("Please enter a valid Password"),
+    phoneNumber: Yup.string()
+      .min(10)
+      .max(13)
+      .required("Please enter a valid Phone Number"),
+    gender: Yup.string().required("Please pick your Gender"),
+    college: Yup.string()
+      .min(2)
+      .max(50)
+      .required("Please enter a valid College Name"),
+    dob: Yup.string().required("Please enter a valid Date of Birth"),
+  });
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: portalSchema,
+    onSubmit: (values, action) => {
+      setIsSubmitting(true);
+      void submitUser(values);
+      console.log(values);
+      action.resetForm();
+    },
+  });
+
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+    formik;
+
+  // const { values, submitForm } = useFormikContext();
+
   const getUser = async () => {
-    let url = "http://localhost:3000/users/get";
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/me`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
         method: "GET",
-        headers: {},
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       const data = await response.json();
+
+      console.log(data);
       if (data.status) {
-        Formik.setValues({
-          first_name: data.data.first_name,
-          last_name: data.data.last_name,
-          about: data.data.about,
-          email: data.data.email,
-          password: data.data.password,
-          phone_number: data.data.phone_number,
-          gender: data.data.gender,
-          college_name: data.data.college_name,
-          dob: data.data.dob,
-        });
-        setLoading(false);
+        values.firstName = data.user.firstName;
+        values.lastName = data.user.lastName;
+        values.bio = data.user.bio;
+        values.email = data.user.email;
+        values.gender = data.user.gender;
+        values.phoneNumber = data.user.phoneNumber;
+        values.college = data.user.college;
+        values.dob = data.user.birthData;
+        void formik.setValues(values);
+        // data.setLoading(false);
       } else {
         setLoading(false);
       }
     } catch (err) {
-      console.log(err);
-      Router.push("../");
+      console.log("err");
+      // void Router.push("../");
     }
   };
 
-  const portalSchema = Yup.object({
-    first_name: Yup.string()
-      .min(2)
-      .max(25)
-      .required("Please enter a First Name"),
-    last_name: Yup.string().min(2).max(25).required("Please enter a Last Name"),
-    about: Yup.string().min(2).max(300).required("Please enter a valid About"),
-    email: Yup.string().email().required("Please enter a valid Email"),
-    password: Yup.string()
-      .min(6)
-      .max(20)
-      .required("Please enter a valid Password"),
-    phone_number: Yup.string()
-      .min(10)
-      .max(10)
-      .required("Please enter a valid Phone Number"),
-    gender: Yup.string().required("Please pick your Gender"),
-    college_name: Yup.string()
-      .min(2)
-      .max(20)
-      .required("Please enter a valid College Name"),
-    //dob: Yup.string().required("Please enter a valid Date of Birth"),
-  });
-
   const submitUser = async (values: {
-    first_name: string;
-    last_name: string;
-    about: string;
+    firstName: string;
+    lastName: string;
+    bio: string;
     email: string;
-    password: string;
-    phone_number: string;
+    //password: string;
+    phoneNumber: string;
     gender: string;
-    college_name: string;
+    college: string;
     dob: string;
   }) => {
-    let url = "http://localhost:3000/users/update";
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/update`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
-        method: "PATCH",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(values),
       });
+      Router.reload();
       const data = await response.json();
       if (data.status === "true") {
-        console.log("Success");
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(true);
+        setMessage("Changes saved successfully");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       } else {
-        console.log("Error");
+        setIsSubmitting(false);
+        setIsOpen(true);
+        setIsSuccess(false);
+        setMessage("Something went wrong. Please try again later");
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
       }
     } catch (err) {
-      console.log(err);
+      setIsSubmitting(false);
+      setIsOpen(true);
+      setIsSuccess(false);
+      setMessage("Something went wrong. Please try again later");
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 2000);
     }
   };
 
@@ -122,7 +179,7 @@ function Portal() {
   const [preview, setPreview] = useState();
 
   const uploadedImage = useRef(null);
-  let formData = new FormData();
+  const formData = new FormData();
   //console.log(uploadedImage.current);
 
   const handleImageUpload = (e) => {
@@ -134,6 +191,7 @@ function Portal() {
       reader.onload = (e) => {
         current.src = e.target.result;
       };
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       reader.readAsDataURL(file);
       //console.log(uploadedImage);
     }
@@ -152,33 +210,26 @@ function Portal() {
     return () => URL.revokeObjectURL(objectUrl);
   }, [selectedFile]);
 
-  const onSelectFile = (e) => {
+  const onSelectFile = (e: { target: { files: string | unknown[] } }) => {
     if (!e.target.files || e.target.files.length === 0) {
       setSelectedFile(undefined);
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     setSelectedFile(e.target.files[0]);
 
     const file = e.target.files[0];
     formData.append("file", file);
-    console.log(file);
-    console.log(formData);
+    // console.log(file);
+    // console.log(formData);
   };
 
-  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
-    useFormik({
-      initialValues: initialValues,
-      validationSchema: portalSchema,
-      onSubmit: (values, action) => {
-        console.log(values);
-        action.resetForm();
-      },
-    });
-  console.log(errors);
+  // console.log(errors);
 
   useEffect(() => {
-    getUser();
+    void getUser();
+    // eslint-disable-next-line
   }, []);
 
   // const submitData = (values: FormData) => {
@@ -216,6 +267,7 @@ function Portal() {
                         <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     ) : (
+                      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
                       <img src={preview} className="h-full w-full" />
                     )}
                   </span>
@@ -238,7 +290,7 @@ function Portal() {
               <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="first_name"
+                    htmlFor="firstName"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     First name
@@ -246,23 +298,25 @@ function Portal() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="first_name"
-                      id="first_name"
+                      name="firstName"
+                      id="firstName"
                       autoComplete="given-name"
-                      value={values.first_name}
+                      value={values.firstName}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
-                    {errors.first_name && touched.first_name ? (
-                      <span className="form-error">{errors.first_name}</span>
+                    {errors.firstName && touched.firstName ? (
+                      <span className="form-error">
+                        First Name should be atleast 2 characters
+                      </span>
                     ) : null}
                   </div>
                 </div>
 
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="last_name"
+                    htmlFor="lastName"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     Last name
@@ -270,51 +324,55 @@ function Portal() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="last_name"
-                      id="last_name"
-                      autoComplete="last_name"
-                      value={values.last_name}
+                      name="lastName"
+                      id="lastName"
+                      autoComplete="lastName"
+                      value={values.lastName}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
-                    {errors.last_name && touched.last_name ? (
-                      <span className="form-error">{errors.last_name}</span>
+                    {errors.lastName && touched.lastName ? (
+                      <span className="form-error">
+                        Last Name should be atleast 2 characters
+                      </span>
                     ) : null}
                   </div>
                 </div>
 
-                {/* About / Bio */}
+                {/* bio / Bio */}
                 <div className="sm:col-span-6">
                   <label
-                    htmlFor="about"
+                    htmlFor="bio"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     About
                   </label>
                   <div className="mt-2">
                     <textarea
-                      id="about"
-                      name="about"
+                      id="bio"
+                      name="bio"
                       rows={3}
-                      value={values.about}
+                      value={values.bio}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
-                      defaultValue={""}
+                      // defaultValue={""}
                     />
                   </div>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-[#37ABBC]">
                     Write a few sentences about yourself.
                   </p>
-                  {errors.about && touched.about ? (
-                    <span className="form-error">{errors.about}</span>
+                  {errors.bio && touched.bio ? (
+                    <span className="form-error">
+                      bio must be atleast 2 characters
+                    </span>
                   ) : null}
                 </div>
 
                 {/* <div className="sm:col-span-3">
                   <label
-                    htmlFor="first_name"
+                    htmlFor="firstName"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     First name
@@ -322,10 +380,10 @@ function Portal() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="first_name"
-                      id="first_name"
+                      name="firstName"
+                      id="firstName"
                       autoComplete="given-name"
-                      value={values.first_name}
+                      value={values.firstName}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -335,7 +393,7 @@ function Portal() {
 
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="last_name"
+                    htmlFor="lastName"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     Last name
@@ -343,10 +401,10 @@ function Portal() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="last_name"
-                      id="last_name"
-                      autoComplete="last_name"
-                      value={values.last_name}
+                      name="lastName"
+                      id="lastName"
+                      autoComplete="lastName"
+                      value={values.lastName}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -354,7 +412,7 @@ function Portal() {
                   </div>
                 </div> */}
 
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-6">
                   <label
                     htmlFor="email"
                     className="block text-sm font-medium leading-6 text-white"
@@ -373,36 +431,12 @@ function Portal() {
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                     {errors.email && touched.email ? (
-                      <span className="form-error">{errors.email}</span>
+                      <span className="form-error">Email must be valid</span>
                     ) : null}
                   </div>
                 </div>
 
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="phone_number"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Phone Number
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="tel"
-                      name="phone_number"
-                      id="phone_number"
-                      autoComplete=""
-                      value={values.phone_number}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                    {errors.phone_number && touched.phone_number ? (
-                      <span className="form-error">{errors.phone_number}</span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="sm:col-span-6">
+                {/* <div className="sm:col-span-3">
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium leading-6 text-white"
@@ -418,15 +452,43 @@ function Portal() {
                       value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 lg:w-[49%]"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                     {errors.password && touched.password ? (
-                      <span className="form-error">{errors.password}</span>
+                      <span className="form-error">
+                        Password must be atleast 6 characters
+                      </span>
+                    ) : null}
+                  </div>
+                </div> */}
+
+                <div className="sm:col-span-6">
+                  <label
+                    htmlFor="phoneNumber"
+                    className="block text-sm font-medium leading-6 text-white"
+                  >
+                    Phone Number
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="tel"
+                      name="phoneNumber"
+                      id="phoneNumber"
+                      autoComplete=""
+                      value={values.phoneNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 lg:w-[49%]"
+                    />
+                    {errors.phoneNumber && touched.phoneNumber ? (
+                      <span className="form-error">
+                        Phone number must be atleast 10 characters
+                      </span>
                     ) : null}
                   </div>
                 </div>
 
-                <div className="sm:col-span-3">
+                <div className="sm:col-span-6">
                   <label
                     htmlFor="gender"
                     className="block text-sm font-medium leading-6 text-white"
@@ -441,7 +503,7 @@ function Portal() {
                       value={values.gender}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className="block w-[50%] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 "
+                      className="block w-[50%]  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 "
                     >
                       <option value="" label="Choose your gender" />
                       <option value="Male" label="Male" />
@@ -457,17 +519,17 @@ function Portal() {
                   </div>
                 </div>
 
-                <div className="sm:col-span-6">
+                {/* <div className="sm:col-span-6">
                   <label
                     htmlFor="street-address"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     Education
                   </label>
-                </div>
-                <div className="sm:col-span-2">
+                </div> */}
+                <div className="sm:col-span-3">
                   <label
-                    htmlFor="college_name"
+                    htmlFor="college"
                     className="block text-sm font-medium leading-6 text-white"
                   >
                     College Name
@@ -475,16 +537,18 @@ function Portal() {
                   <div className="mt-2">
                     <input
                       type="text"
-                      name="college_name"
-                      id="college_name"
+                      name="college"
+                      id="college"
                       autoComplete=""
-                      value={values.college_name}
+                      value={values.college}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
-                    {errors.college_name && touched.college_name ? (
-                      <span className="form-error">{errors.college_name}</span>
+                    {errors.college && touched.college ? (
+                      <span className="form-error">
+                        College Name must be atleast 2 characters
+                      </span>
                     ) : null}
                   </div>
                 </div>
@@ -504,14 +568,19 @@ function Portal() {
                     >
                       <DatePicker
                         format="DD-MM-YYYY"
+                        sx={{
+                          svg: { color: "white" },
+                        }}
                         value={dob}
-                        onChange={(newValue) => setValue(newValue)}
-                        //onBlur={handleBlur}
+                        onChange={(newValue) => {
+                          setValue(newValue);
+                          void formik.setValues({ ...values, dob: newValue });
+                        }}
                       />
                     </LocalizationProvider>
-                    {/* {errors.dob && touched.dob ? (
+                    {errors.dob && touched.dob ? (
                       <span className="form-error">{errors.dob}</span>
-                    ) : null} */}
+                    ) : null}
                   </div>
                 </div>
               </div>
@@ -535,6 +604,46 @@ function Portal() {
             </div>
           </div>
         </form>
+        {isOpen && (
+          <div
+            className={`rounded-md ${
+              isSuccess ? "bg-green-100" : "bg-red-50"
+            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+          >
+            <div className="flex items-center">
+              <div className="mr-3">
+                <div
+                  className={`text-sm ${
+                    isSuccess ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  <p>{message}</p>
+                </div>
+              </div>
+              <button
+                className="flex-shrink-0"
+                onClick={() => {
+                  setIsOpen(false);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke={`${isSuccess ? "green" : "red"}`}
+                  className="h-6 w-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
