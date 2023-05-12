@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -191,7 +194,7 @@ const ProjectForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (  
+  return (
     <>
       <Head>
         <title>DEVSOC&apos;23 | Project Submission</title>
@@ -571,10 +574,15 @@ const ProjectForm = () => {
             <div className="py-10">
               <div className="flex justify-start">
                 <button
+                  disabled={isSubmitting}
                   type="submit"
-                  className="text-md rounded-md bg-[#37ABBC] py-3 px-7 font-semibold text-white shadow-sm hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className={`text-md rounded-md ${
+                    isSubmitting
+                      ? "bg-[#288391] text-gray-400"
+                      : "bg-[#37ABBC] text-white hover:bg-[#288391]"
+                  } py-3 px-7 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
                 >
-                  Save Changes
+                  {isSubmitting ? "Saving... " : "Save Changes"}
                 </button>
                 <button
                   type="button"
