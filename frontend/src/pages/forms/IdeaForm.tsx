@@ -24,7 +24,7 @@ const IdeaForm = () => {
   let accessToken = "";
 
   const getProject = async () => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
@@ -146,7 +146,8 @@ const IdeaForm = () => {
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      submitProject(values);
+      setIsSubmitting(true);
+      void submitProject(values);
     },
     validationSchema: toFormikValidationSchema(projectSchema),
     validateOnChange: true,
