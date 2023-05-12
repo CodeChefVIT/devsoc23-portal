@@ -392,38 +392,43 @@ const IdeaForm = () => {
           </form>
           {isOpen && (
             <div
-            className={`rounded-md ${
-              isSuccess ? "bg-green-100" : "bg-red-50"
-            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
-          >
-            <div className="flex items-center">
-              <div className="mr-3">
-                <div
-                  className={`text-sm ${
-                    isSuccess ? "text-green-700" : "text-red-700"
-                  }`}
-                >
-                  <p>{message}</p>
+              className={`rounded-md ${
+                isSuccess ? "bg-green-100" : "bg-red-50"
+              } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+            >
+              <div className="flex items-center">
+                <div className="mr-3">
+                  <div
+                    className={`text-sm ${
+                      isSuccess ? "text-green-700" : "text-red-700"
+                    }`}
+                  >
+                    <p>{message}</p>
+                  </div>
                 </div>
-              </div>
-              <button className="flex-shrink-0" onClick={()=>{setIsOpen(false)}}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke={`${isSuccess ? "green" : "red"}`}
-                  className="h-6 w-6"
+                <button
+                  className="flex-shrink-0"
+                  onClick={() => {
+                    setIsOpen(false);
+                  }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke={`${isSuccess ? "green" : "red"}`}
+                    className="h-6 w-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
           )}
         </main>
       )}

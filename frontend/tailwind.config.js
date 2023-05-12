@@ -12,7 +12,7 @@ const config = {
       'xl': {'max': '1400px'},
     }
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'),require('flowbite/plugin')],
 };
 
 module.exports = config;
