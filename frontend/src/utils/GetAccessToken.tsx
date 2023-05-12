@@ -3,7 +3,7 @@ import Router from "next/router";
 const getToken = async () => {
   let refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) {
-    Router.push("../");
+    void Router.push("../");
     return false;
   }
   let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/refresh`;
@@ -21,11 +21,11 @@ const getToken = async () => {
     if (data.status === "true") {
       return data.accessToken;
     } else {
-      Router.push("../");
+      void Router.push("../");
     }
   } catch (err) {
     console.log(err);
-    Router.push("../");
+    void Router.push("../");
   }
 };
 

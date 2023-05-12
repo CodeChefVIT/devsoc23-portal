@@ -19,10 +19,11 @@ const IdeaForm = () => {
   };
   const [loading, setLoading] = useState(true);
   const [firstTime, setFirstTime] = useState(true);
-  var accessToken = "";
+  let accessToken = "";
 
   const getProject = async () => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
       const response = await fetch(url, {
@@ -34,7 +35,7 @@ const IdeaForm = () => {
       });
       const data = await response.json();
       if (data.status === "true") {
-        formik.setValues({
+        void formik.setValues({
           projectName: data.project.projectName,
           projectTrack: data.project.projectTrack,
           projectDescription: data.project.projectDescription,
@@ -48,7 +49,7 @@ const IdeaForm = () => {
         setLoading(false);
       }
     } catch (err) {
-      Router.push("../");
+      void Router.push("../");
     }
   };
 
@@ -99,7 +100,7 @@ const IdeaForm = () => {
     projectFigmaLink: string;
     projectDriveLink: string;
   }) => {
-    let url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
+    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
       firstTime ? "idea" : "update"
     }`;
     try {
@@ -126,7 +127,7 @@ const IdeaForm = () => {
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
-      submitProject(values);
+      void submitProject(values);
     },
     validationSchema: toFormikValidationSchema(projectSchema),
     validateOnChange: true,
@@ -134,11 +135,10 @@ const IdeaForm = () => {
   });
 
   // const formChecker = () => {
-    
-
 
   useEffect(() => {
-    getProject();
+    void getProject();
+    // eslint-disable-next-line
   }, []);
 
   return (
