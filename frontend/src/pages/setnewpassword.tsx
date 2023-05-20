@@ -1,12 +1,20 @@
-import { Inter } from "next/font/google";
+/* eslint-disable @next/next/no-page-custom-font */
+// import { Inter } from "next/font/google";
 
 import styles from "../styles/setnewpassword.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import axios from "axios";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { type ApiResponse } from "types/api";
+import devsocimage from "../../public/devsoc.png";
+import starsimage from "../../public/stars.png";
+import saturnimage from "../../public/saturn.png";
+import astroimage from "../../public/astro.png";
+import marsimage from "../../public/mars.png";
+import Image from "next/image";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -36,7 +44,7 @@ export default function Home() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | undefined>("");
 
   const formik = useFormik({
     initialValues: {
@@ -44,67 +52,74 @@ export default function Home() {
       password: "",
     },
     validationSchema: toFormikValidationSchema(validateSchema),
-    onSubmit: async (e) => {
-      axios
-        .post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`, {
-          email: localStorage.getItem("email"),
-          otp: formik.values.otp.toString(),
-          newpass: formik.values.password,
-        })
-        .then((e) => {
-          console.log(e);
-          const status = e.data.status;
-          if (status === "false") {
+    onSubmit: async (_) => {
+      try {
+        if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
+        const response: AxiosResponse<ApiResponse> = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
+          {
+            email: localStorage.getItem("email"),
+            otp: formik.values.otp.toString(),
+            newpass: formik.values.password,
+          }
+        );
+
+        console.log(response);
+        const status = response.data.data.status;
+        if (status === "false") {
+          setTimeout(() => {
+            setIsOpen(true);
+            setIsSuccess(false);
+            setMessage(response.data.data.err);
+          }, 0);
+          setTimeout(() => {
+            setIsOpen(false);
+          }, 1500);
+        } else {
+          setTimeout(() => {
+            setIsSuccess(true);
+            setIsOpen(true);
+            setMessage("Password changed successfully!");
+          }, 0);
+          setTimeout(() => {
+            setIsOpen(false);
+          }, 1500);
+          setTimeout(() => {
+            localStorage.clear();
+            router.push("/signin");
+          }, 2000);
+        }
+      } catch (error) {
+        console.log(error);
+        if (axios.isAxiosError(error)) {
+          const err = error as AxiosError<ApiResponse>;
+          if (error.message !== "Request failed with status code 400") {
             setTimeout(() => {
               setIsOpen(true);
               setIsSuccess(false);
-              setMessage(e.data.err);
+              setMessage(err.message);
             }, 0);
             setTimeout(() => {
               setIsOpen(false);
             }, 1500);
           } else {
-            setTimeout(function () {
-              setIsSuccess(true);
-              setIsOpen(true);
-              setMessage("Password changed successfully !");
-            }, 0);
-            setTimeout(function () {
-              setIsOpen(false);
-            }, 1500);
-            setTimeout(function () {
-              localStorage.clear();
-              router.push("/signin");
-            }, 2000);
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          if (e.message != "Request failed with status code 400") {
             setTimeout(() => {
               setIsOpen(true);
               setIsSuccess(false);
-              setMessage(e.message);
-            }, 0);
-            setTimeout(() => {
-              setIsOpen(false);
-            }, 1500);
-          } else {
-            setTimeout(() => {
-              setIsOpen(true);
-              setIsSuccess(false);
-              setMessage(e.response.data.message);
+              setMessage(err.response?.data.data.message);
             }, 0);
             setTimeout(() => {
               setIsOpen(false);
             }, 1500);
           }
-        });
+        }
+      }
     },
   });
 
   useEffect(() => {
     checkEmail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -117,9 +132,13 @@ export default function Home() {
       />
       <div className={styles.maincontainer}>
         <div className={styles.leftcontainer}>
-          <img src="devsoc.png" className={styles.devsoclogo} />
+          <Image
+            src={devsocimage}
+            alt="asdlkjasd"
+            className={styles.devsoclogo}
+          />
           <h1 className="font-spacegrostesk">
-            Welcome to DevSoc<span className="text-teal-500">'23</span>
+            Welcome to DevSoc<span className="text-teal-500">&apos;23</span>
           </h1>
           <h6 className="font-metropolis">
             Setting new<span className="ml-2 text-teal-700">password</span>
@@ -170,10 +189,10 @@ export default function Home() {
           </form>
         </div>
         <div className={styles.rightcontainer}>
-          <img src="saturn.png" className={styles.saturn} />
-          <img src="stars.png" className={styles.stars} />
-          <img src="astro.png" className={styles.astro} />
-          <img src="mars.png" className={styles.mars} />
+          <Image alt="saturn" src={saturnimage} className={styles.saturn} />
+          <Image alt="stars" src={starsimage} className={styles.stars} />
+          <Image alt="astro" src={astroimage} className={styles.astro} />
+          <Image alt="mars" src={marsimage} className={styles.mars} />
         </div>
         {isOpen && (
           <div

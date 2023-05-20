@@ -4,7 +4,7 @@ import styles from "../styles/forgotpassword.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import axios from "axios";
+import axios, { type AxiosError } from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -32,7 +32,7 @@ export default function Home() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | undefined>("");
 
   const formik = useFormik({
     initialValues: {
@@ -41,8 +41,8 @@ export default function Home() {
     validationSchema: toFormikValidationSchema(validateSchema),
     onSubmit: async (_) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         const response: ApiResponse = await axios.post(
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
           {
             email: formik.values.email,
@@ -75,24 +75,27 @@ export default function Home() {
           }, 2000);
         }
       } catch (error) {
-        if (error.message !== "Request failed with status code 400") {
-          setTimeout(() => {
-            setIsOpen(true);
-            setIsSuccess(false);
-            setMessage(error.message);
-          }, 0);
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            setIsOpen(true);
-            setIsSuccess(false);
-            setMessage(error.response.data.err);
-          }, 0);
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 1500);
+        if (axios.isAxiosError(error)) {
+          const err = error as AxiosError<ApiResponse>;
+          if (err.message !== "Request failed with status code 400") {
+            setTimeout(() => {
+              setIsOpen(true);
+              setIsSuccess(false);
+              setMessage(err.message);
+            }, 0);
+            setTimeout(() => {
+              setIsOpen(false);
+            }, 1500);
+          } else {
+            setTimeout(() => {
+              setIsOpen(true);
+              setIsSuccess(false);
+              setMessage(err.response?.data.data.err);
+            }, 0);
+            setTimeout(() => {
+              setIsOpen(false);
+            }, 1500);
+          }
         }
       }
     },
@@ -114,7 +117,7 @@ export default function Home() {
             className={styles.devsoclogo}
           />
           <h1 className="font-spacegrostesk">
-            Welcome to DevSoc<span className="text-teal-500">'23</span>
+            Welcome to DevSoc<span className="text-teal-500">&apos;23</span>
           </h1>
           <h6 className="font-metropolis">
             Forgot<span className="ml-2 text-teal-700">Password</span>
