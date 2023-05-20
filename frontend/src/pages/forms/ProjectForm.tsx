@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -9,6 +6,8 @@ import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Router from "next/router";
 import getToken from "~/utils/GetAccessToken";
+import axios, { type AxiosResponse } from "axios";
+import { type ApiResponse } from "types/api";
 
 const ProjectForm = () => {
   const initialValues = {
@@ -27,20 +26,23 @@ const ProjectForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState("");
-  let accessToken = "";
+  let accessToken: string | undefined = "";
 
   const getProject = async () => {
+    if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
-      const response = await fetch(url, {
-        method: "GET",
+      if (!accessToken) {
+        return;
+      }
+      const response: AxiosResponse<ApiResponse> = await axios.get(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const data = await response.json();
+      const data = response.data.data;
       if (data.status) {
         void formik.setValues({
           projectName: data.project.projectName,
@@ -138,18 +140,22 @@ const ProjectForm = () => {
     projectVideoLink: string;
     projectDriveLink: string;
   }) => {
+    if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/update`;
     try {
       accessToken = await getToken();
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(values),
-      });
-      const data = await response.json();
+      if (!accessToken) return;
+      const response: AxiosResponse<ApiResponse> = await axios.post(
+        url,
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = response.data.data;
       if (data.status === "true") {
         setIsSubmitting(false);
         setIsOpen(true);
@@ -208,15 +214,15 @@ const ProjectForm = () => {
       )}
       {!loading && (
         <main className="bg-[#242E42] text-white">
-          <div className="px-[2rem] pt-[4rem] pb-4 md:px-[8rem]">
+          <div className="md:px-[8rem] px-[2rem] pb-4 pt-[4rem]">
             <p className="text-4xl">Post your Project</p>
           </div>
           <div className="border-[2px] border-[#37ABBC]" />
           <form
-            className="px-[2rem] md:px-[8rem]"
+            className="md:px-[8rem] px-[2rem]"
             onSubmit={formik.handleSubmit}
           >
-            <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div className="sm:grid-cols-6 mt-6 grid grid-cols-1 gap-x-4 gap-y-6">
               {/* projectName */}
               <div className="col-span-4">
                 <label
@@ -235,7 +241,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectName}
                     placeholder="Enter your project name"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectName && formik.errors.projectName
                         ? "border-2 border-red-500"
                         : ""
@@ -262,7 +268,7 @@ const ProjectForm = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.projectTrack}
-                    className={`block rounded-md py-1.5 text-gray-900 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block rounded-md py-1.5 text-gray-900 ${
                       formik.touched.projectTrack && formik.errors.projectTrack
                         ? "border-b-2 border-red-500"
                         : ""
@@ -297,7 +303,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectTagLine}
                     placeholder="Give a catchy tagline for your project"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectTagLine &&
                       formik.errors.projectTagLine
                         ? "border-2 border-red-500"
@@ -332,7 +338,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectStack}
                     placeholder="Languages, frameworks, platforms, cloudservices, APIs, etc."
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectStack && formik.errors.projectStack
                         ? "border-2 border-red-500"
                         : ""
@@ -363,7 +369,7 @@ const ProjectForm = () => {
                     name="projectDescription"
                     placeholder="Write a brief description of your project"
                     rows={20}
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectDescription &&
                       formik.errors.projectDescription
                         ? "border-2 border-red-500"
@@ -437,7 +443,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectGithubLink}
                     placeholder="https://www.github.com/example"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectGithubLink &&
                       formik.errors.projectGithubLink
                         ? "border-2 border-red-500"
@@ -476,7 +482,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectFigmaLink}
                     placeholder="https://www.figma.com/example"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectFigmaLink &&
                       formik.errors.projectFigmaLink
                         ? "border-2 border-red-500"
@@ -514,7 +520,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectVideoLink}
                     placeholder="https://www.youtube.com/example"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectVideoLink &&
                       formik.errors.projectVideoLink
                         ? "border-2 border-red-500"
@@ -553,7 +559,7 @@ const ProjectForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectDriveLink}
                     placeholder="https://www.google.com/drive/example"
-                    className={`block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 ${
+                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
                       formik.touched.projectDriveLink &&
                       formik.errors.projectDriveLink
                         ? "border-2 border-red-500"
@@ -580,13 +586,13 @@ const ProjectForm = () => {
                     isSubmitting
                       ? "bg-[#288391] text-gray-400"
                       : "bg-[#37ABBC] text-white hover:bg-[#288391]"
-                  } py-3 px-7 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                  } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
                 >
                   {isSubmitting ? "Saving... " : "Save Changes"}
                 </button>
                 <button
                   type="button"
-                  className="text-md ml-3 rounded-md border border-gray-300 bg-transparent py-3 px-10 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391]"
+                  className="text-md ml-3 rounded-md border border-gray-300 bg-transparent px-10 py-3 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391]"
                 >
                   Cancel
                 </button>

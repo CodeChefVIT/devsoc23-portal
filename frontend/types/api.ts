@@ -18,6 +18,18 @@ interface ApiResponse extends AxiosResponse {
       college: string;
       birthData: string;
     };
+
+    project: {
+      projectName: string;
+      projectTrack: string;
+      projectDescription: string;
+      projectFigmaLink: string;
+      projectDriveLink: string;
+      projectTagLine: string;
+      projectStack: string;
+      projectGithubLink: string;
+      projectVideoLink: string;
+    };
   };
 }
 

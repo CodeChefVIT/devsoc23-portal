@@ -4,10 +4,10 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import { IconContext } from "react-icons";
 import FormData from "form-data";
 import { useFormik } from "formik";
-import { type Dayjs } from "dayjs";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+// import { type Dayjs } from "dayjs";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Router from "next/router";
@@ -49,7 +49,7 @@ function Portal() {
   const [message, setMessage] = useState("");
 
   let accessToken: string | undefined = "";
-  const [dob, setValue] = React.useState<Dayjs | null>(null);
+  // const [dob, setValue] = React.useState<Dayjs | null>(null);
 
   // const portalSchema = Yup.object({
   //   firstName: Yup.string()
@@ -608,7 +608,7 @@ function Portal() {
                     DOB
                   </label>
                   <div className="mt-2">
-                    <LocalizationProvider
+                    {/* <LocalizationProvider
                       name="dob"
                       className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
                       dateAdapter={AdapterDayjs}
@@ -627,7 +627,7 @@ function Portal() {
                     </LocalizationProvider>
                     {errors.dob && touched.dob ? (
                       <span className="form-error">{errors.dob}</span>
-                    ) : null}
+                    ) : null} */}
                   </div>
                 </div>
               </div>
