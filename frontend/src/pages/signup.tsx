@@ -86,7 +86,7 @@ export default function Home() {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`,
+          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`,
           {
             firstName: formik.values.firstname,
             lastName: formik.values.lastname,
@@ -198,6 +198,9 @@ export default function Home() {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.firstname}
+                    style={{
+                      color: "black",
+                    }}
                     className={
                       formik.touched.firstname && formik.errors.firstname
                         ? styles.errorfirstnameinput

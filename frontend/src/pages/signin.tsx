@@ -51,7 +51,7 @@ export default function Home() {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
+          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
           { email: formik.values.email, password: formik.values.password }
         );
         if (data.status === "false") {
@@ -68,8 +68,8 @@ export default function Home() {
             setIsSuccess(true);
             setIsOpen(true);
             setMessage("Successful! Logging in");
-            localStorage.setItem("accessToken", data.token);
             localStorage.setItem("refreshToken", data.token);
+            void router.push("/");
           }, 0);
           setTimeout(() => {
             setIsOpen(false);

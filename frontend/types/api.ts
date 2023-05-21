@@ -27,9 +27,9 @@ interface ServerResponse {
   err: string;
   accessToken: string;
   token: string;
-
+  inTeam: boolean;
+  memberDetails: [];
   user: User;
-
   project: Project;
 }
 

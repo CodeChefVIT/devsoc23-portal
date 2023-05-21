@@ -43,7 +43,7 @@ export default function Home() {
       try {
         const { data } = await axios.post<ServerResponse>(
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
+          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
           {
             email: formik.values.email,
           }

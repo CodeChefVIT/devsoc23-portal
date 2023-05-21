@@ -56,7 +56,7 @@ export default function Home() {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
+          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
           {
             email: localStorage.getItem("email"),
             otp: formik.values.otp.toString(),
