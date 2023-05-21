@@ -14,7 +14,7 @@ const server = z.object({
  */
 const client = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
-  NEXT_PUBLIC_SERVER_URL: z.string().url().min(1),
+  NEXT_PUBLIC_SERVER_URL: z.string().min(1),
 });
 
 /**

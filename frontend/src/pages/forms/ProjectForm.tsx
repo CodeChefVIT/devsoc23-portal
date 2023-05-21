@@ -6,8 +6,8 @@ import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Router from "next/router";
 import getToken from "~/utils/GetAccessToken";
-import axios, { type AxiosResponse } from "axios";
-import { type ApiResponse } from "types/api";
+import axios from "axios";
+import { type ServerResponse } from "types/api";
 
 const ProjectForm = () => {
   const initialValues = {
@@ -36,24 +36,23 @@ const ProjectForm = () => {
       if (!accessToken) {
         return;
       }
-      const response: AxiosResponse<ApiResponse> = await axios.get(url, {
+      const { data } = await axios.get<ServerResponse>(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const data = response.data.data;
       if (data.status) {
         void formik.setValues({
-          projectName: data.project.projectName,
-          projectTrack: data.project.projectTrack,
-          projectTagLine: data.project.projectTagLine,
-          projectStack: data.project.projectStack,
-          projectDescription: data.project.projectDescription,
-          projectGithubLink: data.project.projectGithubLink,
-          projectFigmaLink: data.project.projectFigmaLink,
-          projectVideoLink: data.project.projectVideoLink,
-          projectDriveLink: data.project.projectDriveLink,
+          projectName: data.project.projectName || "",
+          projectTrack: data.project.projectTrack || "",
+          projectTagLine: data.project.projectTagLine || "",
+          projectStack: data.project.projectStack || "",
+          projectDescription: data.project.projectDescription || "",
+          projectGithubLink: data.project.projectGithubLink || "",
+          projectFigmaLink: data.project.projectFigmaLink || "",
+          projectVideoLink: data.project.projectVideoLink || "",
+          projectDriveLink: data.project.projectDriveLink || "",
         });
         setLoading(false);
       } else {
@@ -145,17 +144,12 @@ const ProjectForm = () => {
     try {
       accessToken = await getToken();
       if (!accessToken) return;
-      const response: AxiosResponse<ApiResponse> = await axios.post(
-        url,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const data = response.data.data;
+      const { data } = await axios.post<ServerResponse>(url, values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (data.status === "true") {
         setIsSubmitting(false);
         setIsOpen(true);

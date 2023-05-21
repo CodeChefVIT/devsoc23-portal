@@ -12,9 +12,9 @@ import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import Router from "next/router";
 import getToken from "~/utils/GetAccessToken";
-import { type ApiResponse } from "types/api";
-import axios, { type AxiosResponse } from "axios";
+import axios from "axios";
 import Image, { type StaticImageData } from "next/image";
+import { type ServerResponse } from "types/api";
 
 interface Values {
   firstName: string;
@@ -25,7 +25,7 @@ interface Values {
   phoneNumber: string;
   gender: string;
   college: string;
-  dob: string;
+  // dob: string;
 }
 
 function Portal() {
@@ -38,7 +38,7 @@ function Portal() {
     phoneNumber: "",
     gender: "",
     college: "",
-    dob: "",
+    // dob: "",
   };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ function Portal() {
       .min(2)
       .max(50)
       .nonempty("Please enter a valid College Name"),
-    dob: z.string().nonempty("Please enter a valid Date of Birth"),
+    // dob: z.string().nonempty("Please enter a valid Date of Birth"),
   });
 
   const formik = useFormik({
@@ -116,6 +116,7 @@ function Portal() {
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/me`;
     try {
       accessToken = await getToken();
+      console.log(accessToken);
       if (!accessToken) return;
       // const response = await fetch(url, {
       //   method: "GET",
@@ -124,14 +125,12 @@ function Portal() {
       //     Authorization: `Bearer ${accessToken}`,
       //   },
       // });
-      const response: AxiosResponse<ApiResponse> = await axios.get(url, {
+      const { data } = await axios.get<ServerResponse>(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      const data = response.data.data;
 
       console.log(data);
       if (data.status) {
@@ -142,9 +141,9 @@ function Portal() {
         values.gender = data.user.gender;
         values.phoneNumber = data.user.phoneNumber;
         values.college = data.user.college;
-        values.dob = data.user.birthData;
+        // values.dob = data.user.birthData;
         void formik.setValues(values);
-        // data.setLoading(false);
+        setLoading(false);
       } else {
         setLoading(false);
       }
@@ -163,7 +162,7 @@ function Portal() {
     phoneNumber: string;
     gender: string;
     college: string;
-    dob: string;
+    // dob: string;
   }) => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/update`;
@@ -178,18 +177,13 @@ function Portal() {
       //   },
       //   body: JSON.stringify(values),
       // });
-      const response: AxiosResponse<ApiResponse> = await axios.post(
-        url,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const { data } = await axios.post<ServerResponse>(url, values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       Router.reload();
-      const data = response.data.data;
       if (data.status === "true") {
         setIsSubmitting(false);
         setIsOpen(true);
@@ -282,142 +276,148 @@ function Portal() {
 
   return (
     <>
-      <main>
-        <div className="background-color: #242E42 md:px-[8rem] px-[2rem] pb-4 pt-[4rem]">
-          <p className="text-4xl">Personal Information</p>
-        </div>
-        <div className="border-[2px] border-[#37ABBC]" />
-        <form
-          onSubmit={handleSubmit}
-          className="md:px-[100px] max-w-4xl space-y-8 divide-y divide-gray-200 px-[50px] text-white"
-        >
-          <div className="space-y-8 divide-y divide-gray-200">
-            <div className="pt-1">
-              <div className="sm:col-span-6 pt-[20px]">
-                <label
-                  htmlFor="photo"
-                  className="block text-sm font-medium leading-6 text-white"
-                >
-                  Photo
-                </label>
-                <div className="mt-2 flex items-center">
-                  <span className="h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-                    {!selectedFile ? (
-                      <svg
-                        className="h-full w-full text-gray-300"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
-                    ) : (
-                      <Image
-                        alt="preview"
-                        src={preview as StaticImageData | string}
-                        className="h-full w-full"
-                      />
-                    )}
-                  </span>
-
-                  <input
-                    type="file"
-                    id="upload"
-                    className="ml-5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                    onChange={onSelectFile}
-                    hidden
-                  />
-                  <label htmlFor="upload">
-                    <IconContext.Provider value={{ color: "#37ABBC" }}>
-                      <AiOutlineCloudUpload className="pl-3 text-4xl" />
-                    </IconContext.Provider>
-                  </label>
-                </div>
-              </div>
-
-              <div className="sm:grid-cols-6 mt-6 grid grid-cols-1 gap-x-4 gap-y-6">
-                <div className="sm:col-span-3">
+      {loading && (
+        <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
+          Loading...
+        </main>
+      )}
+      {!loading && (
+        <main>
+          <div className="background-color: #242E42 md:px-[8rem] px-[2rem] pb-4 pt-[4rem]">
+            <p className="text-4xl">Personal Information</p>
+          </div>
+          <div className="border-[2px] border-[#37ABBC]" />
+          <form
+            onSubmit={handleSubmit}
+            className="md:px-[100px] max-w-4xl space-y-8 divide-y divide-gray-200 px-[50px] text-white"
+          >
+            <div className="space-y-8 divide-y divide-gray-200">
+              <div className="pt-1">
+                <div className="sm:col-span-6 pt-[20px]">
                   <label
-                    htmlFor="firstName"
+                    htmlFor="photo"
                     className="block text-sm font-medium leading-6 text-white"
                   >
-                    First name
+                    Photo
                   </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="firstName"
-                      id="firstName"
-                      autoComplete="given-name"
-                      value={values.firstName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                    />
-                    {errors.firstName && touched.firstName ? (
-                      <span className="form-error">
-                        First Name should be atleast 2 characters
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="lastName"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Last name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="lastName"
-                      id="lastName"
-                      autoComplete="lastName"
-                      value={values.lastName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                    />
-                    {errors.lastName && touched.lastName ? (
-                      <span className="form-error">
-                        Last Name should be atleast 2 characters
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                {/* bio / Bio */}
-                <div className="sm:col-span-6">
-                  <label
-                    htmlFor="bio"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    About
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="bio"
-                      name="bio"
-                      rows={3}
-                      value={values.bio}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:py-1.5 sm:text-sm sm:leading-6 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                      // defaultValue={""}
-                    />
-                  </div>
-                  <p className="mt-2 text-sm text-[#37ABBC]">
-                    Write a few sentences about yourself.
-                  </p>
-                  {errors.bio && touched.bio ? (
-                    <span className="form-error">
-                      bio must be atleast 2 characters
+                  <div className="mt-2 flex items-center">
+                    <span className="h-12 w-12 overflow-hidden rounded-full bg-gray-100">
+                      {!selectedFile ? (
+                        <svg
+                          className="h-full w-full text-gray-300"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      ) : (
+                        <Image
+                          alt="preview"
+                          src={preview as StaticImageData | string}
+                          className="h-full w-full"
+                        />
+                      )}
                     </span>
-                  ) : null}
+
+                    <input
+                      type="file"
+                      id="upload"
+                      className="ml-5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      onChange={onSelectFile}
+                      hidden
+                    />
+                    <label htmlFor="upload">
+                      <IconContext.Provider value={{ color: "#37ABBC" }}>
+                        <AiOutlineCloudUpload className="pl-3 text-4xl" />
+                      </IconContext.Provider>
+                    </label>
+                  </div>
                 </div>
 
-                {/* <div className="sm:col-span-3">
+                <div className="sm:grid-cols-6 mt-6 grid grid-cols-1 gap-x-4 gap-y-6">
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="firstName"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      First name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        name="firstName"
+                        id="firstName"
+                        autoComplete="given-name"
+                        value={values.firstName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                      />
+                      {errors.firstName && touched.firstName ? (
+                        <span className="form-error">
+                          First Name should be atleast 2 characters
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="lastName"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      Last name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        name="lastName"
+                        id="lastName"
+                        autoComplete="lastName"
+                        value={values.lastName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                      />
+                      {errors.lastName && touched.lastName ? (
+                        <span className="form-error">
+                          Last Name should be atleast 2 characters
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* bio / Bio */}
+                  <div className="sm:col-span-6">
+                    <label
+                      htmlFor="bio"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      About
+                    </label>
+                    <div className="mt-2">
+                      <textarea
+                        id="bio"
+                        name="bio"
+                        rows={3}
+                        value={values.bio}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:py-1.5 sm:text-sm sm:leading-6 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                        // defaultValue={""}
+                      />
+                    </div>
+                    <p className="mt-2 text-sm text-[#37ABBC]">
+                      Write a few sentences about yourself.
+                    </p>
+                    {errors.bio && touched.bio ? (
+                      <span className="form-error">
+                        bio must be atleast 2 characters
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {/* <div className="sm:col-span-3">
                   <label
                     htmlFor="firstName"
                     className="block text-sm font-medium leading-6 text-white"
@@ -459,31 +459,31 @@ function Portal() {
                   </div>
                 </div> */}
 
-                <div className="sm:col-span-6">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Email
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      autoComplete="email"
-                      value={values.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                    />
-                    {errors.email && touched.email ? (
-                      <span className="form-error">Email must be valid</span>
-                    ) : null}
+                  <div className="sm:col-span-6">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      Email
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        autoComplete="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                      />
+                      {errors.email && touched.email ? (
+                        <span className="form-error">Email must be valid</span>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
 
-                {/* <div className="sm:col-span-3">
+                  {/* <div className="sm:col-span-3">
                   <label
                     htmlFor="password"
                     className="block text-sm font-medium leading-6 text-white"
@@ -509,64 +509,64 @@ function Portal() {
                   </div>
                 </div> */}
 
-                <div className="sm:col-span-6">
-                  <label
-                    htmlFor="phoneNumber"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Phone Number
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      id="phoneNumber"
-                      autoComplete=""
-                      value={values.phoneNumber}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6 lg:w-[49%] block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                    />
-                    {errors.phoneNumber && touched.phoneNumber ? (
-                      <span className="form-error">
-                        Phone number must be atleast 10 characters
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="sm:col-span-6">
-                  <label
-                    htmlFor="gender"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Gender
-                  </label>
-                  <div className="mt-2">
-                    <select
-                      id="gender"
-                      name="gender"
-                      autoComplete="gender"
-                      value={values.gender}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6  block w-[50%] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 "
+                  <div className="sm:col-span-6">
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-sm font-medium leading-6 text-white"
                     >
-                      <option value="" label="Choose your gender" />
-                      <option value="Male" label="Male" />
-                      <option value="Female" label="Female" />
-                      <option
-                        value="Prefer Not to Say"
-                        label="Prefer Not to Say"
+                      Phone Number
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        id="phoneNumber"
+                        autoComplete=""
+                        value={values.phoneNumber}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6 lg:w-[49%] block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
                       />
-                    </select>
-                    {errors.gender && touched.gender ? (
-                      <span className="form-error">{errors.gender}</span>
-                    ) : null}
+                      {errors.phoneNumber && touched.phoneNumber ? (
+                        <span className="form-error">
+                          Phone number must be atleast 10 characters
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
 
-                {/* <div className="sm:col-span-6">
+                  <div className="sm:col-span-6">
+                    <label
+                      htmlFor="gender"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      Gender
+                    </label>
+                    <div className="mt-2">
+                      <select
+                        id="gender"
+                        name="gender"
+                        autoComplete="gender"
+                        value={values.gender}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6  block w-[50%] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 "
+                      >
+                        <option value="" label="Choose your gender" />
+                        <option value="Male" label="Male" />
+                        <option value="Female" label="Female" />
+                        <option
+                          value="Prefer Not to Say"
+                          label="Prefer Not to Say"
+                        />
+                      </select>
+                      {errors.gender && touched.gender ? (
+                        <span className="form-error">{errors.gender}</span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* <div className="sm:col-span-6">
                   <label
                     htmlFor="street-address"
                     className="block text-sm font-medium leading-6 text-white"
@@ -574,41 +574,41 @@ function Portal() {
                     Education
                   </label>
                 </div> */}
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="college"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    College Name
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="college"
-                      id="college"
-                      autoComplete=""
-                      value={values.college}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
-                    />
-                    {errors.college && touched.college ? (
-                      <span className="form-error">
-                        College Name must be atleast 2 characters
-                      </span>
-                    ) : null}
+                  <div className="sm:col-span-3">
+                    <label
+                      htmlFor="college"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      College Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        name="college"
+                        id="college"
+                        autoComplete=""
+                        value={values.college}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                      />
+                      {errors.college && touched.college ? (
+                        <span className="form-error">
+                          College Name must be atleast 2 characters
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
 
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="dob"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    DOB
-                  </label>
-                  <div className="mt-2">
-                    {/* <LocalizationProvider
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="dob"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      DOB
+                    </label>
+                    <div className="mt-2">
+                      {/* <LocalizationProvider
                       name="dob"
                       className="sm:text-sm sm:leading-6 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
                       dateAdapter={AdapterDayjs}
@@ -628,70 +628,71 @@ function Portal() {
                     {errors.dob && touched.dob ? (
                       <span className="form-error">{errors.dob}</span>
                     ) : null} */}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="pt-5">
-            <div className="flex justify-start">
-              <button
-                type="button"
-                className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="ml-3 inline-flex justify-center rounded-md bg-[#37ABBC] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </form>
-        {isOpen && (
-          <div
-            className={`rounded-md ${
-              isSuccess ? "bg-green-100" : "bg-red-50"
-            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
-          >
-            <div className="flex items-center">
-              <div className="mr-3">
-                <div
-                  className={`text-sm ${
-                    isSuccess ? "text-green-700" : "text-red-700"
-                  }`}
+            <div className="pt-5">
+              <div className="flex justify-start">
+                <button
+                  type="button"
+                  className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                 >
-                  <p>{message}</p>
-                </div>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="ml-3 inline-flex justify-center rounded-md bg-[#37ABBC] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  Save
+                </button>
               </div>
-              <button
-                className="flex-shrink-0"
-                onClick={() => {
-                  setIsOpen(false);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke={`${isSuccess ? "green" : "red"}`}
-                  className="h-6 w-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
             </div>
-          </div>
-        )}
-      </main>
+          </form>
+          {isOpen && (
+            <div
+              className={`rounded-md ${
+                isSuccess ? "bg-green-100" : "bg-red-50"
+              } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+            >
+              <div className="flex items-center">
+                <div className="mr-3">
+                  <div
+                    className={`text-sm ${
+                      isSuccess ? "text-green-700" : "text-red-700"
+                    }`}
+                  >
+                    <p>{message}</p>
+                  </div>
+                </div>
+                <button
+                  className="flex-shrink-0"
+                  onClick={() => {
+                    setIsOpen(false);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke={`${isSuccess ? "green" : "red"}`}
+                    className="h-6 w-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </main>
+      )}
     </>
   );
 }

@@ -5,8 +5,8 @@ import Router from "next/router";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import getToken from "~/utils/GetAccessToken";
-import axios, { type AxiosResponse } from "axios";
-import { type ApiResponse } from "types/api";
+import axios, { type AxiosError } from "axios";
+import { type ServerResponse } from "types/api";
 
 const IdeaForm = () => {
   const initialValues = {
@@ -30,16 +30,14 @@ const IdeaForm = () => {
     const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
-
       if (!accessToken) return;
 
-      const response: AxiosResponse<ApiResponse> = await axios.get(url, {
+      const { data } = await axios.get<ServerResponse>(url, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      const data = response.data.data;
       if (data.status === "true") {
         void formik.setValues({
           projectName: data.project.projectName,
@@ -55,7 +53,15 @@ const IdeaForm = () => {
         setLoading(false);
       }
     } catch (err) {
-      void Router.push("../");
+      if (axios.isAxiosError(err)) {
+        const error = err as AxiosError<ServerResponse>;
+        if (error.response?.data.err === "No project found") {
+          setFirstTime(true);
+          setLoading(false);
+        } else {
+          void Router.push("/");
+        }
+      }
     }
   };
 
@@ -114,17 +120,12 @@ const IdeaForm = () => {
       accessToken = await getToken();
       if (!accessToken) return;
 
-      const response: AxiosResponse<ApiResponse> = await axios.post(
-        url,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const data = response.data.data;
+      const { data } = await axios.post<ServerResponse>(url, values, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (data.status === "true") {
         setIsSubmitting(false);
         setIsOpen(true);

@@ -1,6 +1,6 @@
 import Router from "next/router";
-import { type ApiResponse } from "types/api";
-import axios, { type AxiosResponse } from "axios";
+import { type ServerResponse } from "types/api";
+import axios from "axios";
 
 const getToken = async (): Promise<string | undefined> => {
   const refreshToken = localStorage.getItem("refreshToken");
@@ -21,7 +21,7 @@ const getToken = async (): Promise<string | undefined> => {
     //     refreshToken: refreshToken,
     //   }),
     // });
-    const response: AxiosResponse<ApiResponse> = await axios.post(
+    const { data } = await axios.post<ServerResponse>(
       url,
       {
         refreshToken: refreshToken,
@@ -32,7 +32,7 @@ const getToken = async (): Promise<string | undefined> => {
         },
       }
     );
-    const data = response.data.data;
+    console.log(data);
     if (data.status === "true") {
       return data.accessToken;
     } else {

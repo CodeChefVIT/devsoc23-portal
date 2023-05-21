@@ -5,11 +5,11 @@ import styles from "../styles/signup.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import axios, { type AxiosError } from "axios";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { type ApiResponse } from "types/api";
+import { type ServerResponse } from "types/api";
 // import { Router } from 'next/router';
 
 import devsocpng from "../../public/devsoc.png";
@@ -85,7 +85,7 @@ export default function Home() {
     onSubmit: async () => {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        const response: AxiosResponse<ApiResponse> = await axios.post(
+        const { data } = await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`,
           {
             firstName: formik.values.firstname,
@@ -100,13 +100,11 @@ export default function Home() {
           }
         );
 
-        const status = response.data.data.status;
-
-        if (status === "false") {
+        if (data.status === "false") {
           setTimeout(() => {
             setIsOpen(true);
             setIsSuccess(false);
-            setMessage(response.data.data.err);
+            setMessage(data.err);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -126,7 +124,7 @@ export default function Home() {
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          const err = error as AxiosError<ApiResponse>;
+          const err = error as AxiosError<ServerResponse>;
           if (formik.values.phonenumber.toString().length !== 12) {
             setTimeout(() => {
               setIsOpen(true);
@@ -141,7 +139,7 @@ export default function Home() {
               setTimeout(() => {
                 setIsOpen(true);
                 setIsSuccess(false);
-                setMessage(err.response?.data.data.message);
+                setMessage(err.response?.data.message);
               }, 0);
               setTimeout(() => {
                 setIsOpen(false);
@@ -150,7 +148,7 @@ export default function Home() {
               setTimeout(() => {
                 setIsOpen(true);
                 setIsSuccess(false);
-                setMessage(err.response?.data.data.err);
+                setMessage(err.response?.data.err);
               }, 0);
               setTimeout(() => {
                 setIsOpen(false);

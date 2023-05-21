@@ -5,11 +5,11 @@ import styles from "../styles/signin.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import axios, { type AxiosError } from "axios";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { type ApiResponse } from "types/api";
+import { type ServerResponse } from "types/api";
 import Image from "next/image";
 
 import devsocpng from "../../public/devsoc.png";
@@ -50,17 +50,15 @@ export default function Home() {
     onSubmit: async () => {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        const response: AxiosResponse<ApiResponse> = await axios.post(
+        const { data } = await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
           { email: formik.values.email, password: formik.values.password }
         );
-        const status = response.data.data.status;
-
-        if (status === "false") {
+        if (data.status === "false") {
           setTimeout(() => {
             setIsOpen(true);
             setIsSuccess(false);
-            setMessage(response.data.data.err);
+            setMessage(data.err);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -70,8 +68,8 @@ export default function Home() {
             setIsSuccess(true);
             setIsOpen(true);
             setMessage("Successful! Logging in");
-            localStorage.setItem("accessToken", response.data.data.token);
-            localStorage.setItem("refreshToken", response.data.data.token);
+            localStorage.setItem("accessToken", data.token);
+            localStorage.setItem("refreshToken", data.token);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -82,7 +80,7 @@ export default function Home() {
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          const err = error as AxiosError<ApiResponse>;
+          const err = error as AxiosError<ServerResponse>;
           if (err.message !== "Request failed with status code 400") {
             setTimeout(() => {
               setIsOpen(true);
@@ -96,7 +94,7 @@ export default function Home() {
             setTimeout(() => {
               setIsOpen(true);
               setIsSuccess(false);
-              setMessage(err.response?.data.data.err);
+              setMessage(err.response?.data.err);
             }, 0);
             setTimeout(() => {
               setIsOpen(false);

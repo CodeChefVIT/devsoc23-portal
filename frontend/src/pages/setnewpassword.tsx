@@ -5,10 +5,10 @@ import styles from "../styles/setnewpassword.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import axios, { type AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { type ApiResponse } from "types/api";
+import { type ServerResponse } from "types/api";
 import devsocimage from "../../public/devsoc.png";
 import starsimage from "../../public/stars.png";
 import saturnimage from "../../public/saturn.png";
@@ -55,7 +55,7 @@ export default function Home() {
     onSubmit: async (_) => {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        const response: AxiosResponse<ApiResponse> = await axios.post(
+        const { data } = await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
           {
             email: localStorage.getItem("email"),
@@ -63,14 +63,11 @@ export default function Home() {
             newpass: formik.values.password,
           }
         );
-
-        console.log(response);
-        const status = response.data.data.status;
-        if (status === "false") {
+        if (data.status === "false") {
           setTimeout(() => {
             setIsOpen(true);
             setIsSuccess(false);
-            setMessage(response.data.data.err);
+            setMessage(data.err);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -92,7 +89,7 @@ export default function Home() {
       } catch (error) {
         console.log(error);
         if (axios.isAxiosError(error)) {
-          const err = error as AxiosError<ApiResponse>;
+          const err = error as AxiosError<ServerResponse>;
           if (error.message !== "Request failed with status code 400") {
             setTimeout(() => {
               setIsOpen(true);
@@ -106,7 +103,7 @@ export default function Home() {
             setTimeout(() => {
               setIsOpen(true);
               setIsSuccess(false);
-              setMessage(err.response?.data.data.message);
+              setMessage(err.response?.data.message);
             }, 0);
             setTimeout(() => {
               setIsOpen(false);

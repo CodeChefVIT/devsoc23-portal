@@ -14,7 +14,7 @@ import saturnpng from "../../public/saturn.png";
 import astropng from "../../public/astro.png";
 import marspng from "../../public/mars.png";
 
-import type { ApiResponse } from "types/api";
+import type { ServerResponse } from "types/api";
 
 /* const inter = Inter({ subsets: ['latin'] }) */
 
@@ -41,7 +41,7 @@ export default function Home() {
     validationSchema: toFormikValidationSchema(validateSchema),
     onSubmit: async (_) => {
       try {
-        const response: ApiResponse = await axios.post(
+        const { data } = await axios.post<ServerResponse>(
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
           {
@@ -49,13 +49,11 @@ export default function Home() {
           }
         );
 
-        const status = response.data.status;
-
-        if (status === "false") {
+        if (data.status === "false") {
           setTimeout(() => {
             setIsOpen(true);
             setIsSuccess(false);
-            setMessage(response.data.err);
+            setMessage(data.err);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -64,7 +62,7 @@ export default function Home() {
           setTimeout(() => {
             setIsSuccess(true);
             setIsOpen(true);
-            setMessage(response.data.message);
+            setMessage(data.message);
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
@@ -76,7 +74,7 @@ export default function Home() {
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          const err = error as AxiosError<ApiResponse>;
+          const err = error as AxiosError<ServerResponse>;
           if (err.message !== "Request failed with status code 400") {
             setTimeout(() => {
               setIsOpen(true);
@@ -90,7 +88,7 @@ export default function Home() {
             setTimeout(() => {
               setIsOpen(true);
               setIsSuccess(false);
-              setMessage(err.response?.data.data.err);
+              setMessage(err.response?.data.err);
             }, 0);
             setTimeout(() => {
               setIsOpen(false);
