@@ -218,12 +218,16 @@ const Dashboard = () => {
 
         const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/leave`;
 
-        const response = await axios.post<ServerResponse>(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await axios.post<ServerResponse>(
+          url,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         if (response.status === 200) {
           setEditMode(false);
