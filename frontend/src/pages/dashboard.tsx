@@ -15,30 +15,38 @@ import Tracks from "./../components/tracks";
 import getToken from "~/utils/GetAccessToken";
 import axios from "axios";
 import { type ServerResponse } from "types/api";
-import { access } from "fs";
+import { setRevalidateHeaders } from "next/dist/server/send-payload";
 
 interface Member {
   Id: string;
   firstName: string;
   lastName: string;
   isBoard: boolean;
+  teamId: string;
 }
 
 const Dashboard = () => {
   const text = "#20293C";
-  let accessToken: string | undefined = "";
+  const [accessToken, setAccessToken] = useState<string | undefined>("");
 
-  // const tokenFromLocal = async () => {
-  //   accessToken = await getToken();
-  // };
+  useEffect(() => {
+    getToken()
+      .then((token) => {
+        setAccessToken(token);
+        console.log(accessToken);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
-  // const router = useRouter();
   //ui texts
   const [joinTeam, setJoinTeam] = useState("Enter a code to join a team");
   const [textCreate, setTextCreate] = useState("Create");
-  const [teamName, setTeamName] = useState("Cookoff");
+  const [isLeader, setIsleader] = useState<boolean | undefined>(false);
+  const [teamName, setTeamName] = useState("");
+  const [teamId, setTeamId] = useState<string>("");
   const [data, setData] = useState<ServerResponse | Record<string, never>>({});
-  // const [teamId, setTeamId] = useState("");
 
   // toggle states
   const [teamCode, setTeamCode] = useState("");
@@ -56,14 +64,13 @@ const Dashboard = () => {
 
   const handleInputBlur = () => {
     async function blur() {
-      accessToken = await getToken();
       if (!accessToken) return;
       if (teamName.length === 0) {
         return;
       }
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/646a5fd0314549b71700a36c`;
+        const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/${teamId}`;
 
         const response = await axios.patch<ServerResponse>(
           url,
@@ -112,8 +119,10 @@ const Dashboard = () => {
 
         if (response.status === 200) {
           setData(response.data);
-          setHasTeam(response.data.inTeam);
           console.log(data);
+          setHasTeam(response.data.inTeam);
+          setIsleader(response.data.isTeamLeader);
+          // setTeamId(response.data.memberDetails[0].teamId);
         } else {
           throw new Error("Couldn't fetch team data!");
         }
@@ -123,13 +132,13 @@ const Dashboard = () => {
     };
 
     void checkIsMember();
-  }, [accessToken, data]);
+  }, [accessToken]);
 
   const items: ReactNode = hasTeam
     ? data.memberDetails.map((member: Member) => (
         <div
           key={member.Id}
-          className="md:pl-10 md:pr-20 lg:pl-10 lg:pr-20 mb-5 flex flex-row items-center rounded-2xl bg-[#20293C] py-5 pl-5 pr-6"
+          className="md:pl-10 md:pr-20 lg:pl-10 lg:pr-20 mb-5 flex w-full flex-row items-center justify-between rounded-2xl bg-[#20293C] py-5 pl-5 pr-6"
         >
           <div className="md:mr-36  lg:mr-[30rem] mr-20 flex flex-row items-center">
             <Image
@@ -139,12 +148,12 @@ const Dashboard = () => {
               width={40}
               height={40}
             />
-            <p className="md:text-xl lg:text-xl text-lg text-[#376C82]">
-              {member.firstName} {member.lastName}
+            <p className="md:text-xl lg:text-xl text-lg font-bold text-[#61BFE7]">
+              {member.firstName.toUpperCase()} {member.lastName.toUpperCase()}
             </p>
           </div>
           <div>
-            {member.isBoard && (
+            {isLeader && (
               <Image
                 src={Crown as StaticImageData}
                 alt=""
@@ -211,7 +220,7 @@ const Dashboard = () => {
 
         const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/leave`;
 
-        const response = await axios.patch<ServerResponse>(url, {
+        const response = await axios.post<ServerResponse>(url, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
@@ -232,12 +241,12 @@ const Dashboard = () => {
     void leave();
   };
 
-  const handleCreateTeam = (e: React.ChangeEvent) => {
+  const handleCreateTeam = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     async function create() {
+      console.log(teamName);
       try {
         if (teamName.length === 0) return;
-        accessToken = await getToken();
         console.log(accessToken);
         setTextCreate("Creating...");
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
@@ -247,7 +256,7 @@ const Dashboard = () => {
 
         const response = await axios.post<ServerResponse>(
           url,
-          { teamName },
+          { teamName: teamName },
           {
             headers: {
               "Content-Type": "application/json",
@@ -259,6 +268,7 @@ const Dashboard = () => {
 
         if (response.status === 200) {
           setTextCreate("Created!");
+          setTeamName("");
           setJoinTeam("Successfully joined team!");
           setHasTeam(!hasTeam);
           window.location.reload();
@@ -287,7 +297,7 @@ const Dashboard = () => {
           </a>
         </div>
 
-        <div className="md:items-start md:px-10 lg:items-start lg:px-20 flex flex-col items-center px-5 pb-16 pt-16">
+        <div className="md:items-start md:px-10 lg:items-start lg:px-20 md:w[60vw] lg:w-[60vw] md:mx-20  lg:mx-20 mx-5 flex w-[80vw] flex-col px-5 pb-16 pt-16">
           <h1 className="pb-10 text-4xl font-bold text-white ">
             Team Information
           </h1>
@@ -306,11 +316,20 @@ const Dashboard = () => {
                       />
 
                       <a className="cursor-pointer" onClick={handleInputBlur}>
-                        <Image
-                          src={Edit as StaticImageData}
-                          alt=""
-                          className="mx-3"
-                        />
+                        {editMode ? (
+                          //TODO: To change the icon to checkmark
+                          <Image
+                            src={Edit as StaticImageData}
+                            alt=""
+                            className="mx-3"
+                          />
+                        ) : (
+                          <Image
+                            src={Edit as StaticImageData}
+                            alt=""
+                            className="mx-3"
+                          />
+                        )}
                       </a>
                     </div>
                   ) : (
@@ -328,8 +347,8 @@ const Dashboard = () => {
                 </div>
               </div>
               <div>{items}</div>
-              <div className="md:flex-row lg:flex-row flex flex-col justify-between">
-                <div className="flex flex-col items-center justify-center py-3">
+              <div className="md:flex-col lg:flex-col flex w-full flex-row items-center justify-between">
+                <div className="flex flex-col items-center py-3">
                   <Tooltip
                     content={"Copied to Clipboard"}
                     trigger="click"
@@ -337,7 +356,7 @@ const Dashboard = () => {
                   >
                     <button
                       type="button"
-                      className="text-md w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      className="text-md hover:bg-[#288391] w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                       onClick={handleClick}
                     >
                       {text}
@@ -396,6 +415,10 @@ const Dashboard = () => {
                             type="text"
                             id="team-name"
                             name="team-name"
+                            value={teamName}
+                            onChange={(event) =>
+                              setTeamName(event.target.value)
+                            }
                             placeholder="Enter team name"
                             required
                           />
@@ -411,7 +434,7 @@ const Dashboard = () => {
                           <button
                             type="submit"
                             onClick={handleCreateTeam}
-                            className="text-md rounded-md bg-[#37ABBC] px-8 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391]"
+                            className="text-md hover:bg-[#288391] rounded-md bg-[#37ABBC] px-8 py-3 font-semibold text-white shadow-sm transition-all"
                           >
                             {textCreate}
                           </button>
@@ -428,7 +451,7 @@ const Dashboard = () => {
                 <div className="flex flex-col items-start justify-center py-3">
                   <button
                     type="button"
-                    className="text-md w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="text-md hover:bg-[#288391] w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={togglePopup}
                   >
                     Create Team

@@ -5,12 +5,10 @@ import Marquee from "react-fast-marquee";
 
 const tracks = () => {
   return (
-    <div className="pt-6">
+    <div className="">
       <div className="lg:px-30 md:px-30 py-5">
-        <div className="md:items-start lg:items-start flex flex-col items-center">
-          <h1 className="md:px-10 lg:px-20 px-0 text-4xl font-bold text-white">
-            Tracks
-          </h1>
+        <div className="md:items-start md:px-10 lg:items-start lg:px-20  md:w[60vw] lg:w-[60vw]  md:mx-20 lg:mx-20 mx-5 flex flex-col px-5 pb-16">
+          <h1 className="pb-10 text-4xl font-bold text-white">Tracks</h1>
           <div className="p-2"></div>
           <div className="w-full">
             <Marquee gradient={false} speed={100}>
