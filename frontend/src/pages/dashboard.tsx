@@ -33,12 +33,11 @@ const Dashboard = () => {
     getToken()
       .then((token) => {
         setAccessToken(token);
-        console.log(accessToken);
       })
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [accessToken]);
 
   //ui texts
   const [joinTeam, setJoinTeam] = useState("Enter a code to join a team");
@@ -213,22 +212,26 @@ const Dashboard = () => {
 
   const handleLeaveTeam = () => {
     async function leave() {
-      console.log("here");
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         if (!accessToken) return;
 
         const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/leave`;
 
-        const response = await axios.post<ServerResponse>(url, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const response = await axios.post<ServerResponse>(
+          url,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
 
         if (response.status === 200) {
           setEditMode(false);
+          setHasTeam(!hasTeam);
           console.log("Successfully left team!");
         } else {
           throw new Error("Failed to leave team");
@@ -236,7 +239,6 @@ const Dashboard = () => {
       } catch (error) {
         console.error(error);
       }
-      setHasTeam(!hasTeam);
     }
     void leave();
   };
@@ -368,7 +370,7 @@ const Dashboard = () => {
                 </div>
                 <div className="w-10"></div>
                 <div className="py-7">
-                  <a onClick={handleLeaveTeam}>
+                  <button onClick={handleLeaveTeam}>
                     <div className="flex cursor-pointer flex-row items-center justify-center">
                       <p className="pt-1 text-white transition-all hover:text-gray-300">
                         Leave Team
@@ -379,7 +381,7 @@ const Dashboard = () => {
                         className="h-15 w-15 mx-3"
                       />
                     </div>
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
