@@ -69,13 +69,13 @@ export default function Home() {
             setIsOpen(true);
             setMessage("Successful! Logging in");
             localStorage.setItem("refreshToken", data.token);
-            void router.push("/");
+            void router.push("/dashboard");
           }, 0);
           setTimeout(() => {
             setIsOpen(false);
           }, 1500);
           setTimeout(() => {
-            void router.push("/");
+            void router.push("/dashboard");
           }, 2000);
         }
       } catch (error) {

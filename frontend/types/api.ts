@@ -20,6 +20,13 @@ interface Project {
   projectGithubLink: string;
   projectVideoLink: string;
 }
+interface Member {
+  Id: string;
+  firstName: string;
+  lastName: string;
+  isBoard: boolean;
+  teamId: string;
+}
 
 interface ServerResponse {
   status: string;
@@ -28,7 +35,8 @@ interface ServerResponse {
   accessToken: string;
   token: string;
   inTeam: boolean;
-  memberDetails: [];
+  isTeamLeader: boolean;
+  memberDetails: Member[];
   user: User;
   project: Project;
 }
