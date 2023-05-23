@@ -1,4 +1,5 @@
-import { Inter } from "next/font/google";
+/* eslint-disable @next/next/no-page-custom-font */
+// import { Inter } from "next/font/google";
 
 import styles from '../styles/signup.module.css'
 import { useFormik } from 'formik'
@@ -9,27 +10,56 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Router } from 'next/router';
-import Select from 'react-select'
 
 export default function Home() {
+  const router = useRouter();
 
-    const router = useRouter();
+  const validateSchema = z.object({
+    firstname: z.string({
+      required_error: "Required",
+      invalid_type_error: "First name must be a string",
+    }),
+    lastname: z.string({
+      required_error: "Required",
+      invalid_type_error: "Last name must be a string",
+    }),
+    email: z
+      .string({
+        required_error: "Required",
+        invalid_type_error: "Email must be a string",
+      })
+      .email("Enter a valid email"),
+    password: z
+      .string({
+        required_error: "Required",
+        invalid_type_error: "Password must be a string",
+      })
+      .min(8, "Password should be between 8 and 20 characters")
+      .max(20, "Password should be between 8 and 20 characters"),
+    bio: z.string({
+      required_error: "Required",
+      invalid_type_error: "Bio must be a string",
+    }),
+    gender: z.string({ required_error: "Required" }),
+    collegename: z
+      .string({
+        required_error: "Required",
+        invalid_type_error: "College name must be a string",
+      })
+      .min(10, "College name must have min 10 chars"),
+    birthday: z.string({
+      required_error: "Required",
+      invalid_type_error: "Birthday must be selected",
+    }),
+    phonenumber: z.number({
+      required_error: "Required",
+      invalid_type_error: "Phone no must be entered",
+    }),
+  });
 
-    const validateSchema = z.object({
-        firstname: z.string({ required_error: "Required", invalid_type_error: "First name must be a string" }),
-        lastname: z.string({ required_error: "Required", invalid_type_error: "Last name must be a string" }),
-        email: z.string({ required_error: "Required", invalid_type_error: "Email must be a string" }).email("Enter a valid email"),
-        password: z.string({ required_error: "Required", invalid_type_error: "Password must be a string" }).min(8, "Password should be between 8 and 20 characters").max(20, "Password should be between 8 and 20 characters"),
-        bio: z.string({ required_error: "Required", invalid_type_error: "Bio must be a string" }),
-        gender: z.string({ required_error: "Required" }),
-        collegename: z.string({ required_error: "Required", invalid_type_error: "College name must be a string" }).min(10, "College name must have min 10 chars"),
-        birthday: z.string({ required_error: "Required", invalid_type_error: "Birthday must be selected" }),
-        phonenumber: z.number({ required_error: "Required", invalid_type_error: "Phone no must be entered" })
-    })
-
-    const [isOpen, setIsOpen] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
-    const [message, setMessage] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState<string | undefined>("");
 
     const formik = useFormik({
         initialValues: {
@@ -45,7 +75,7 @@ export default function Home() {
         },
         validationSchema: toFormikValidationSchema(validateSchema),
         onSubmit: async () => {
-            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`, { firstName: formik.values.firstname, lastName: formik.values.lastname, email: formik.values.email, password: formik.values.password, phoneNumber: "+" + formik.values.phonenumber.toString(), college: formik.values.collegename, collegeYear: "2021", bio: formik.values.bio, birthDate: formik.values.birthday, gender : formik.values.gender })
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`, { firstName: formik.values.firstname, lastName: formik.values.lastname, email: formik.values.email, password: formik.values.password, phoneNumber: "+" + formik.values.phonenumber.toString(), college: formik.values.collegename, collegeYear: "2021", bio: formik.values.bio, birthDate: formik.values.birthday })
                 .then((e) => {
                     const status = e.data.status
                     if (status === 'false') {
@@ -109,7 +139,6 @@ export default function Home() {
                 })
         }
     })
-    
     return (
         <>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
