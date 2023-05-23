@@ -75,7 +75,7 @@ export default function Home() {
         },
         validationSchema: toFormikValidationSchema(validateSchema),
         onSubmit: async () => {
-            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`, { firstName: formik.values.firstname, lastName: formik.values.lastname, email: formik.values.email, password: formik.values.password, phoneNumber: "+" + formik.values.phonenumber.toString(), college: formik.values.collegename, collegeYear: "2021", bio: formik.values.bio, birthDate: formik.values.birthday })
+            axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`, { firstName: formik.values.firstname, lastName: formik.values.lastname, email: formik.values.email, password: formik.values.password, phoneNumber: "+" + formik.values.phonenumber.toString(), college: formik.values.collegename, collegeYear: "2021", bio: formik.values.bio, birthDate: formik.values.birthday, gender : formik.values.gender })
                 .then((e) => {
                     const status = e.data.status
                     if (status === 'false') {
