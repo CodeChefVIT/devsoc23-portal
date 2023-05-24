@@ -35,10 +35,13 @@ interface ServerResponse {
   accessToken: string;
   token: string;
   inTeam: boolean;
+  inviteCode: string;
   isTeamLeader: boolean;
   memberDetails: Member[];
   user: User;
   project: Project;
+  teamName: string;
+  teamId: string;
 }
 
 export type { ServerResponse };

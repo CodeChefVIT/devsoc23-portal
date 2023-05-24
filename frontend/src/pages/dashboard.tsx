@@ -41,6 +41,7 @@ const Dashboard = () => {
 
   //ui texts
   const [joinTeam, setJoinTeam] = useState("Enter a code to join a team");
+  const [inviteCode, setInviteCode] = useState("");
   const [textCreate, setTextCreate] = useState("Create");
   const [isLeader, setIsleader] = useState<boolean | undefined>(false);
   const [teamName, setTeamName] = useState("");
@@ -71,7 +72,7 @@ const Dashboard = () => {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/${teamId}`;
 
-        const response = await axios.patch<ServerResponse>(
+        const response = await axios.post<ServerResponse>(
           url,
           { teamName },
           {
@@ -120,8 +121,10 @@ const Dashboard = () => {
           setData(response.data);
           console.log(data);
           setHasTeam(response.data.inTeam);
+          setTeamName(response.data.teamName);
+          setInviteCode(response.data.inviteCode);
           setIsleader(response.data.isTeamLeader);
-          // setTeamId(response.data.memberDetails[0].teamId);
+          setTeamId(response.data.teamId);
         } else {
           throw new Error("Couldn't fetch team data!");
         }
@@ -137,9 +140,9 @@ const Dashboard = () => {
     ? data.memberDetails.map((member: Member) => (
         <div
           key={member.Id}
-          className="md:pl-10 md:pr-20 lg:pl-10 lg:pr-20 mb-5 flex w-full flex-row items-center justify-between rounded-2xl bg-[#20293C] py-5 pl-5 pr-6"
+          className="mb-5 flex w-full flex-row items-center justify-between rounded-2xl bg-[#20293C] py-5 pl-5 pr-6 md:pl-10 md:pr-20 lg:pl-10 lg:pr-20"
         >
-          <div className="md:mr-36  lg:mr-[30rem] mr-20 flex flex-row items-center">
+          <div className="mr-20 flex flex-row items-center md:mr-20">
             <Image
               src={Profile as StaticImageData}
               alt=""
@@ -147,7 +150,7 @@ const Dashboard = () => {
               width={40}
               height={40}
             />
-            <p className="md:text-xl lg:text-xl text-lg font-bold text-[#61BFE7]">
+            <p className="w-fit text-lg font-bold text-[#61BFE7] md:text-xl lg:text-xl">
               {member.firstName.toUpperCase()} {member.lastName.toUpperCase()}
             </p>
           </div>
@@ -175,11 +178,11 @@ const Dashboard = () => {
           if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
           if (!accessToken) return;
 
-          const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/join`;
+          const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/team/join/${teamCode}`;
 
           const response = await axios.post<ServerResponse>(
             url,
-            { teamCode },
+            {},
             {
               headers: {
                 "Content-Type": "application/json",
@@ -190,6 +193,8 @@ const Dashboard = () => {
           if (response.status === 200) {
             setJoinTeam("Successfully joined team!");
             window.location.reload();
+          } else if (response.status === 400) {
+            setJoinTeam(response.data.err);
           } else {
             throw new Error("Failed to join team");
           }
@@ -203,8 +208,8 @@ const Dashboard = () => {
 
   const handleClick = () => {
     try {
-      void navigator.clipboard.writeText(text);
-      console.log("Text copied to clipboard:", text);
+      void navigator.clipboard.writeText(inviteCode);
+      console.log("Text copied to clipboard:", inviteCode);
     } catch (err) {
       console.error("Failed to copy text:", err);
     }
@@ -295,19 +300,19 @@ const Dashboard = () => {
       <main className="min-h-screen overflow-x-hidden bg-[#242E42]">
         <div className="flex flex-col items-start justify-start pl-5 pt-5">
           <a className="cursor-pointer" href="/">
-            <Image src={Devsoc} alt="" className="md:w-16 lg:w-16 w-16" />
+            <Image src={Devsoc} alt="" className="w-16 md:w-16 lg:w-16" />
           </a>
         </div>
 
-        <div className="md:items-start md:px-10 lg:items-start lg:px-20 md:w[60vw] lg:w-[60vw] md:mx-20  lg:mx-20 mx-5 flex w-[80vw] flex-col px-5 pb-16 pt-16">
+        <div className="md:w[60vw] mx-5 flex w-[80vw] flex-col px-5 pb-16  pt-16 md:mx-20 md:items-start md:px-10 lg:mx-20 lg:w-[60vw] lg:items-start lg:px-20">
           <h1 className="pb-10 text-4xl font-bold text-white ">
             Team Information
           </h1>
           {hasTeam ? (
-            <div className="md:px-10 lg:px-10 rounded-2xl bg-[#2F3B52] py-10 pl-5 pr-6">
+            <div className="rounded-2xl bg-[#2F3B52] py-10 pl-5 pr-6 md:px-10 lg:px-10">
               <div className="flex flex-row items-center justify-between">
-                <div className="w-full pb-5 text-2xl font-bold text-white">
-                  {editMode ? (
+                <div className="w-[80vw] pb-5 text-2xl font-bold text-white md:w-[60vw] lg:w-[60vw]">
+                  {isLeader && editMode ? (
                     <div className="flex flex-row items-center justify-between text-gray-700">
                       <input
                         type="text"
@@ -337,19 +342,23 @@ const Dashboard = () => {
                   ) : (
                     <div className="flex flex-row items-center justify-between">
                       {teamName}
-                      <a className="cursor-pointer" onClick={handleEditClick}>
-                        <Image
-                          src={Edit as StaticImageData}
-                          alt=""
-                          className="mx-3"
-                        />
-                      </a>
+                      {isLeader ? (
+                        <a className="cursor-pointer" onClick={handleEditClick}>
+                          <Image
+                            src={Edit as StaticImageData}
+                            alt=""
+                            className="mx-3"
+                          />
+                        </a>
+                      ) : (
+                        <></>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
               <div>{items}</div>
-              <div className="md:flex-col lg:flex-col flex w-full flex-row items-center justify-between">
+              <div className="flex w-full flex-col items-center justify-between md:flex-row lg:flex-row">
                 <div className="flex flex-col items-center py-3">
                   <Tooltip
                     content={"Copied to Clipboard"}
@@ -358,10 +367,10 @@ const Dashboard = () => {
                   >
                     <button
                       type="button"
-                      className="text-md hover:bg-[#288391] w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                      className="text-md w-[50vw] rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 md:w-96 lg:w-96"
                       onClick={handleClick}
                     >
-                      {text}
+                      #{inviteCode}
                     </button>
                   </Tooltip>
                   <p className="py-1 text-white">
@@ -386,7 +395,7 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <div className="md:px-10 lg:px-10 rounded-2xl bg-[#2F3B52] py-10 pl-5 pr-6">
+            <div className="rounded-2xl bg-[#2F3B52] py-10 pl-5 pr-6 md:px-10 lg:px-10">
               <AnimatePresence>
                 {isOpen && (
                   <motion.div
@@ -436,7 +445,7 @@ const Dashboard = () => {
                           <button
                             type="submit"
                             onClick={handleCreateTeam}
-                            className="text-md hover:bg-[#288391] rounded-md bg-[#37ABBC] px-8 py-3 font-semibold text-white shadow-sm transition-all"
+                            className="text-md rounded-md bg-[#37ABBC] px-8 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391]"
                           >
                             {textCreate}
                           </button>
@@ -449,11 +458,11 @@ const Dashboard = () => {
               <p className="py-3 text-xl font-bold text-white">
                 Sorry you are not in any team!
               </p>
-              <div className="md:flex-row lg:flex-row flex flex-col justify-between">
+              <div className="flex flex-col justify-between md:flex-row lg:flex-row">
                 <div className="flex flex-col items-start justify-center py-3">
                   <button
                     type="button"
-                    className="text-md hover:bg-[#288391] w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="text-md w-64 rounded-md bg-[#37ABBC] px-10 py-3 font-semibold text-white shadow-sm transition-all hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={togglePopup}
                   >
                     Create Team
@@ -467,7 +476,7 @@ const Dashboard = () => {
                     name="teamcode"
                     id="teamcode"
                     placeholder="Enter Code"
-                    className="sm:text-sm sm:leading-6 block w-64 min-w-0 flex-1 rounded-lg border-0 px-3 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+                    className="block w-64 min-w-0 flex-1 rounded-lg border-0 px-3 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     value={teamCode}
                     disabled={teamCode.length === 6}
                     onChange={(event) => setTeamCode(event.target.value)}
@@ -478,10 +487,15 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-
         <Tracks />
 
-        <Submission />
+        {hasTeam ? (
+          <>
+            <Submission />
+          </>
+        ) : (
+          <></>
+        )}
       </main>
     </>
   );
