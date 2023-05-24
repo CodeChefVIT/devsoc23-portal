@@ -300,10 +300,19 @@ const Dashboard = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="min-h-screen overflow-x-hidden bg-[#242E42]">
-        <div className="flex flex-col items-start justify-start pl-5 pt-5">
+        <div className="mx-10 my-10 flex flex-row items-start justify-between">
           <a className="cursor-pointer" href="/">
             <Image src={Devsoc} alt="" className="w-16 md:w-16 lg:w-16" />
           </a>
+          <div>
+            <a className="cursor-pointer" href="/portal">
+              <Image
+                src={Profile as StaticImageData}
+                alt=""
+                className="w-16 md:w-16 lg:w-16"
+              />
+            </a>
+          </div>
         </div>
 
         <div className="md:w[60vw] mx-5 flex w-[80vw] flex-col px-5 pb-16  pt-16 md:mx-20 md:items-start md:px-10 lg:mx-20 lg:w-[60vw] lg:items-start lg:px-20">
@@ -489,7 +498,7 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        <Tracks />
+        {/*<Tracks />*/}
 
         {hasTeam ? (
           <>
