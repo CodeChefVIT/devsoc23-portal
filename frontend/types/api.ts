@@ -42,6 +42,7 @@ interface ServerResponse {
   project: Project;
   teamName: string;
   teamId: string;
+  teamLeader: string;
 }
 
 export type { ServerResponse };

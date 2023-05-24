@@ -47,6 +47,7 @@ const Dashboard = () => {
   const [teamName, setTeamName] = useState("");
   const [teamId, setTeamId] = useState<string>("");
   const [data, setData] = useState<ServerResponse | Record<string, never>>({});
+  const [teamLeaderId, setTeamLeaderId] = useState("");
 
   // toggle states
   const [teamCode, setTeamCode] = useState("");
@@ -118,13 +119,14 @@ const Dashboard = () => {
         });
 
         if (response.status === 200) {
-          setData(response.data);
           console.log(data);
+          setData(response.data);
           setHasTeam(response.data.inTeam);
           setTeamName(response.data.teamName);
           setInviteCode(response.data.inviteCode);
           setIsleader(response.data.isTeamLeader);
           setTeamId(response.data.teamId);
+          setTeamLeaderId(response.data.teamLeader);
         } else {
           throw new Error("Couldn't fetch team data!");
         }
@@ -155,7 +157,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div>
-            {isLeader && (
+            {member.Id == teamLeaderId && (
               <Image
                 src={Crown as StaticImageData}
                 alt=""
