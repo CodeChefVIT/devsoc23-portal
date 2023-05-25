@@ -38,7 +38,7 @@ export default function Home() {
       setTimeout(() => {
         setIsOpen(false);
         void router.push("/signin");
-      }, 2500);
+      }, 2000);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const error = err as AxiosError<ServerResponse>;
@@ -57,7 +57,7 @@ export default function Home() {
         setTimeout(() => {
           setIsOpen(false);
           void router.push("/signin");
-        }, 2500);
+        }, 2000);
       }
     }
   };

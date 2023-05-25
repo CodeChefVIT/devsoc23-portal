@@ -133,7 +133,7 @@ export default function Home() {
         }, 2000);
         setTimeout(() => {
           router.push("/signin");
-        }, 2500);
+        }, 2000);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const err = error as AxiosError<ServerResponse>;

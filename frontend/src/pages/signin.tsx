@@ -57,7 +57,7 @@ export default function Home() {
       setIsSuccess(true);
       setTimeout(() => {
         setIsOpen(false);
-      }, 2500);
+      }, 2000);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const error = err as AxiosError<ServerResponse>;
@@ -75,7 +75,7 @@ export default function Home() {
         setIsResending(false);
         setTimeout(() => {
           setIsOpen(false);
-        }, 2500);
+        }, 2000);
       }
     }
   };
@@ -105,7 +105,7 @@ export default function Home() {
         }, 2000);
         setTimeout(() => {
           router.push("/dashboard");
-        }, 2500);
+        }, 2000);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const error = err as AxiosError<ServerResponse>;
