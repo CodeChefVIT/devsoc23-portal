@@ -120,8 +120,7 @@ export default function Home() {
       setIsSubmitting(true);
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        values.phoneNumber = "+" + values.phoneNumber;
-        const { data } = await axios.post<ServerResponse>(
+        await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`,
           values
         );
@@ -134,7 +133,7 @@ export default function Home() {
         }, 2000);
         setTimeout(() => {
           router.push("/signin");
-        }, 2500);
+        }, 2000);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const err = error as AxiosError<ServerResponse>;
@@ -410,7 +409,7 @@ export default function Home() {
                           : ""
                       }`}
                     >
-                      <option disabled value="Choose" label="Choose your gender" />
+                      <option disabled value="" label="Choose your gender" />
                       <option value="Male" label="Male" />
                       <option value="Female" label="Female" />
                       <option

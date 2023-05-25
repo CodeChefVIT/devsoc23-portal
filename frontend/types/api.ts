@@ -6,9 +6,10 @@ interface User {
   gender: string;
   phoneNumber: string;
   college: string;
-  birthData: string;
+  birthDate: string;
   mode: string;
   github: string;
+  image: string;
 }
 
 interface Project {

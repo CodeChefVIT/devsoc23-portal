@@ -13,10 +13,10 @@ body {
   background-size: cover;
 }
 
-.right{
+.right {
   background-image: url("/right.svg");
   background-repeat: no-repeat;
-  background-size: cover
+  background-size: cover;
 }
 
 .react-tel-input {
@@ -28,7 +28,25 @@ body {
 }
 .react-tel-input .flag-dropdown {
   border-radius: 0.375rem 0 0 0.375rem !important;
-} 
+}
+
+::-webkit-scrollbar {
+  width: 0.4rem;
+  background: #d2fffa;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #d2fffa;
+  border-radius: 0.6rem;
+  z-index: -99;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #37abbc;
+  border-radius: 1rem;
+}
 
 @layer base {
   @font-face {

@@ -17,7 +17,6 @@ export default function Home() {
   const [isSuccess, setIsSuccess] = useState(false);
   let accessToken: string | undefined = "";
 
-
   const resetPassSchema = z
     .object({
       oldpass: z
@@ -64,7 +63,7 @@ export default function Home() {
         if (!accessToken) {
           return;
         }
-        const { data } = await axios.post<ServerResponse>(
+        await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/reset`,
           values,
           {
@@ -83,7 +82,7 @@ export default function Home() {
         }, 2000);
         setTimeout(() => {
           router.push("/dashboard");
-        }, 2500);
+        }, 2000);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const error = err as AxiosError<ServerResponse>;
