@@ -70,7 +70,7 @@ export default function Home() {
           otp: values.otp,
           newpass: values.password,
         };
-        const { data } = await axios.post<ServerResponse>(
+        await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
           send
         );
@@ -83,7 +83,7 @@ export default function Home() {
         }, 2000);
         setTimeout(() => {
           router.push("/signin");
-        }, 2500);
+        }, 2000);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const error = err as AxiosError<ServerResponse>;

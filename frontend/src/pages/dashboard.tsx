@@ -3,6 +3,7 @@ import Image, { type StaticImageData } from "next/image";
 import { useState, useEffect, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tooltip } from "@nextui-org/react";
+import { HiCheck } from "react-icons/hi";
 
 import Devsoc from "./../../assets/logo.png";
 
@@ -15,6 +16,7 @@ import Submission from "./../components/submission";
 import getToken from "~/utils/GetAccessToken";
 import axios from "axios";
 import { type ServerResponse } from "types/api";
+import Link from "next/link";
 // import { setRevalidateHeaders } from "next/dist/server/send-payload";
 
 interface Member {
@@ -136,7 +138,7 @@ const Dashboard = () => {
     };
 
     void checkIsMember();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
   const items: ReactNode = hasTeam
@@ -302,17 +304,21 @@ const Dashboard = () => {
       </Head>
       <main className="min-h-screen overflow-x-hidden bg-[#242E42]">
         <div className="mx-10 my-10 flex flex-row items-start justify-between">
-          <a className="cursor-pointer" href="/">
+          <Link className="cursor-pointer" href="/">
             <Image src={Devsoc} alt="" className="w-16 md:w-16 lg:w-16" />
-          </a>
+          </Link>
           <div>
-            <a className="cursor-pointer" href="/profile">
-              <Image
-                src={Profile as StaticImageData}
-                alt=""
-                className="w-16 md:w-16 lg:w-16"
-              />
-            </a>
+            <Link className="cursor-pointer" href="/profile">
+              <div className="h-12 w-12">
+                <svg
+                  className="h-full w-full text-gray-300"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -337,17 +343,9 @@ const Dashboard = () => {
                       <a className="cursor-pointer" onClick={handleInputBlur}>
                         {editMode ? (
                           //TODO: To change the icon to checkmark
-                          <Image
-                            src={Edit as StaticImageData}
-                            alt=""
-                            className="mx-3"
-                          />
+                          <HiCheck color="white" size={26} className="mx-3" />
                         ) : (
-                          <Image
-                            src={Edit as StaticImageData}
-                            alt=""
-                            className="mx-3"
-                          />
+                          <HiCheck color="white" size={26} className="mx-3" />
                         )}
                       </a>
                     </div>

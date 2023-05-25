@@ -41,7 +41,7 @@ export default function Home() {
       setIsSubmitting(true);
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        const { data } = await axios.post<ServerResponse>(
+        await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
           values
         );
