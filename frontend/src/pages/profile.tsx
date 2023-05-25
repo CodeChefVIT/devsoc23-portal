@@ -31,6 +31,7 @@ interface Values {
   birthDate: string;
   mode: string;
   github: string;
+  image: File | undefined;
 }
 
 function Profile() {
@@ -46,6 +47,7 @@ function Profile() {
     birthDate: "",
     mode: "Choose",
     github: "",
+    image: undefined,
   };
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -140,7 +142,7 @@ function Profile() {
     onSubmit: (values, action) => {
       setIsSubmitting(true);
       void submitUser(values);
-      console.log(values);
+      // console.log(values);
       action.resetForm();
     },
   });
@@ -170,7 +172,7 @@ function Profile() {
         },
       });
 
-      console.log(data);
+      // console.log(data);
       if (data.status) {
         values.firstName = data.user.firstName;
         values.lastName = data.user.lastName;
@@ -179,9 +181,11 @@ function Profile() {
         values.gender = data.user.gender;
         values.phoneNumber = data.user.phoneNumber;
         values.college = data.user.college;
-        values.birthDate = data.user.birthData;
+        values.birthDate = data.user.birthDate;
         values.mode = data.user.mode;
         values.github = data.user.github;
+        console.log(data.user.image);
+        setPreview(data.user.image);
         void formik.setValues(values);
         if (values.college === "VIT Vellore") {
           setIsVITian(true);
@@ -192,7 +196,7 @@ function Profile() {
         setLoading(false);
       }
     } catch (err) {
-      console.log("err");
+      // console.log("err");
       // void Router.push("../");
     }
   };
@@ -208,11 +212,12 @@ function Profile() {
     birthDate: string;
     mode: string;
     github: string;
+    image: File | undefined;
   }) => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
     const formData = new FormData();
-    const x = `+${values.phoneNumber as string}`;
-    console.log(x);
+    // const x = `+${values.phoneNumber as string}`;
+    // console.log(x);
     formData.append("firstName", values.firstName);
     formData.append("lastName", values.lastName);
     formData.append("bio", values.bio);
@@ -223,6 +228,8 @@ function Profile() {
     formData.append("birthDate", values.birthDate);
     formData.append("mode", values.mode);
     formData.append("github", values.github);
+    formData.append("image", values.image);
+    // console.log(formData);
     const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/users/update`;
     try {
       accessToken = await getToken();
@@ -243,8 +250,8 @@ function Profile() {
         },
       });
       // Router.reload();
-      console.log(data);
-      console.log(values);
+      // console.log(data);
+      // console.log(values);
       if (data.status === "true") {
         setIsSubmitting(false);
         setIsOpen(true);
@@ -274,10 +281,12 @@ function Profile() {
   };
 
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
-  const [preview, setPreview] = useState<StaticImageData | string>();
+  const [preview, setPreview] = useState<StaticImageData | string | undefined>(
+    ""
+  );
 
   // const uploadedImage = useRef<HTMLInputElement>(null);
-  const formData = new FormData();
+  // const formData = new FormData();
   //console.log(uploadedImage.current);
 
   // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -311,16 +320,17 @@ function Profile() {
   }, [selectedFile]);
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log(e.target.files);
     if (!e.target.files || e.target.files.length === 0) {
       setSelectedFile(undefined);
       return;
     }
 
-    setSelectedFile(e.target.files[0]);
-
     const file = e.target.files[0];
-    formData.append("file", file);
-    // console.log(file);
+
+    setSelectedFile(file);
+
+    void formik.setFieldValue("image", file);
     // console.log(formData);
   };
 
@@ -378,7 +388,7 @@ function Profile() {
                   </label>
                   <div className="mt-2 flex items-center">
                     <span className="h-12 w-12 overflow-hidden rounded-full bg-gray-100">
-                      {!selectedFile ? (
+                      {!preview && !selectedFile ? (
                         <svg
                           className="h-full w-full text-gray-300"
                           fill="currentColor"
@@ -389,7 +399,7 @@ function Profile() {
                       ) : (
                         <Image
                           alt="preview"
-                          src={preview as StaticImageData | string}
+                          src={preview as string}
                           height={48}
                           width={48}
                           // className="h-12 w-12"
@@ -406,7 +416,10 @@ function Profile() {
                     />
                     <label htmlFor="upload">
                       <IconContext.Provider value={{ color: "#37ABBC" }}>
-                        <AiOutlineCloudUpload className="pl-3 text-4xl" />
+                        <div className=" ml-2 flex flex-col justify-start">
+                          <label className="text-sm">Max Image Size: 1MB</label>
+                          <AiOutlineCloudUpload className="h-7 w-7 cursor-pointer text-4xl" />
+                        </div>
                       </IconContext.Provider>
                     </label>
                   </div>

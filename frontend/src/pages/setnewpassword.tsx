@@ -70,7 +70,7 @@ export default function Home() {
           otp: values.otp,
           newpass: values.password,
         };
-        const { data } = await axios.post<ServerResponse>(
+        await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot`,
           send
         );
