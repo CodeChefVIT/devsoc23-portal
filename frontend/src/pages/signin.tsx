@@ -1,27 +1,26 @@
 /* eslint-disable @next/next/no-page-custom-font */
-// import { Inter } from 'next/font/google'
-
-import styles from "../styles/signin.module.css";
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios, { type AxiosError } from "axios";
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { type ServerResponse } from "types/api";
-import Image from "next/image";
-
 import devsocpng from "../../public/devsoc.png";
-import starspng from "../../public/stars.png";
-import saturnpng from "../../public/saturn.png";
-import astropng from "../../public/astro.png";
-import marspng from "../../public/mars.png";
+import Image from "next/image";
+import Head from "next/head";
+import getToken from "~/utils/GetAccessToken";
 
 export default function Home() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loader, setLoader] = useState(false);
 
-  const validateSchema = z.object({
+  const userSchema = z.object({
     email: z
       .string({
         required_error: "Required",
@@ -33,193 +32,256 @@ export default function Home() {
         required_error: "Required",
         invalid_type_error: "Password must be a string",
       })
-      .min(8, "Password should be between 8 and 20 characters")
-      .max(20, "Password should be between 8 and 20 characters"),
+      .regex(
+        /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+        "Password should contain atleast 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
+      ),
   });
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [message, setMessage] = useState<string | undefined>("");
 
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
-    validationSchema: toFormikValidationSchema(validateSchema),
-    onSubmit: async () => {
+    validationSchema: toFormikValidationSchema(userSchema),
+    validateOnChange: true,
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
-          { email: formik.values.email, password: formik.values.password }
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
+          values
         );
-        if (data.status === "false") {
-          setTimeout(() => {
-            setIsOpen(true);
-            setIsSuccess(false);
-            setMessage(data.err);
-          }, 0);
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 1500);
-        } else {
-          setTimeout(() => {
-            setIsSuccess(true);
-            setIsOpen(true);
-            setMessage("Successful! Logging in");
-            localStorage.setItem("refreshToken", data.token);
-            void router.push("/dashboard");
-          }, 0);
-          setTimeout(() => {
-            setIsOpen(false);
-          }, 1500);
-          setTimeout(() => {
-            void router.push("/dashboard");
-          }, 2000);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          const err = error as AxiosError<ServerResponse>;
-          if (err.message !== "Request failed with status code 400") {
-            setTimeout(() => {
-              setIsOpen(true);
-              setIsSuccess(false);
-              setMessage(err.message);
-            }, 0);
-            setTimeout(() => {
-              setIsOpen(false);
-            }, 1500);
+        setIsSubmitting(false);
+        setIsSuccess(true);
+        setIsOpen(true);
+        setMessage("Logged in successfully!");
+        localStorage.setItem("refreshToken", data.token);
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 2000);
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2500);
+      } catch (err) {
+        if (axios.isAxiosError(err)) {
+          const error = err as AxiosError<ServerResponse>;
+          if (error.response?.data.err === "User not found") {
+            setMessage("User not found");
+          } else if (error.response?.data.err === "Wrong password") {
+            setMessage("Wrong password");
           } else {
-            setTimeout(() => {
-              setIsOpen(true);
-              setIsSuccess(false);
-              setMessage(err.response?.data.err);
-            }, 0);
-            setTimeout(() => {
-              setIsOpen(false);
-            }, 1500);
+            setMessage("Something went wrong. Please try again later");
           }
+          setIsSubmitting(false);
+          setIsOpen(true);
+          setIsSuccess(false);
+          setTimeout(() => {
+            setIsOpen(false);
+          }, 2000);
         }
       }
     },
   });
+  const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
+    formik;
+
+  useEffect(() => {
+    if (localStorage.getItem("refreshToken")) {
+      void getToken().then((res) => {
+        if (res) {
+          router.push("/dashboard");
+        } else {
+          setLoader(true);
+        }
+      });
+    } else {
+      setLoader(true);
+    }
+    //eslint-disable-next-line
+  }, []);
   return (
     <>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap"
-        rel="stylesheet"
-      />
-      <div className={styles.maincontainer}>
-        <div className={styles.leftcontainer}>
-          <Image alt="" src={devsocpng} className={styles.devsoclogo} />
-          <h1 className="font-spacegrostesk">
-            Welcome to DevSoc<span className="text-teal-500">&apos;23</span>
-          </h1>
-          <h6 className="font-metropolis">
-            <Link
-              href="/signup"
-              className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
-            >
-              Create an account
-            </Link>{" "}
-            or<span className="ml-2 text-teal-700">log in</span>
-          </h6>
-          <form className="font-metropolis" onSubmit={formik.handleSubmit}>
-            <div className={styles.formcontainer}>
-              <label>Email</label>
-              <input
-                type="email"
-                placeholder="user@email.com"
-                name="email"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.email}
-                className={
-                  formik.touched.email && formik.errors.email
-                    ? styles.erroremailinput
-                    : styles.emailinput
-                }
-              ></input>
-              {formik.touched.email && formik.errors.email ? (
-                <span>{formik.errors.email}</span>
-              ) : null}
-              <label>Password</label>
-              <input
-                type="password"
-                placeholder="Password"
-                name="password"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.password}
-                className={
-                  formik.touched.password && formik.errors.password
-                    ? styles.errorpasswordinput
-                    : styles.passwordinput
-                }
-              ></input>
-              {formik.touched.password && formik.errors.password ? (
-                <span>{formik.errors.password}</span>
-              ) : null}
-              <Link href="/forgotpassword">Forgot Password</Link>
-              <button
-                type="submit"
-                className={"bg-teal-200 hover:cursor-pointer"}
+      <Head>
+        <title>DEVSoC&apos;23 | Sign In</title>
+        <meta name="description" content="DevSoc'23 Sign Up Page" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+      {!loader ? (<main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
+        Loading...
+      </main>) : (
+      <div className="stars flex min-h-screen items-center scroll-smooth ">
+        <div className="flex w-full flex-col lg:w-[65%]">
+          <Image
+            src={devsocpng}
+            alt="devsoc logo"
+            className="absolute left-0 top-0 m-4 h-16 w-16"
+          />
+          <div className="mx-12 mt-24 lg:ml-32 lg:mr-0">
+            <h1 className="font-spacegrostesk text-2xl font-bold text-white md:text-5xl ">
+              Welcome to DEVSoC<span className="text-teal-500">&apos;23</span>
+            </h1>
+            {/* <h6 className="font-metropolis text-xl font-extralight text-white md:text-3xl">
+              <Link
+                href="/signup"
+                className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
               >
-                Log in
-              </button>
-            </div>
-          </form>
-        </div>
-        <div className={styles.rightcontainer}>
-          <Image alt="" src={saturnpng} className={styles.saturn} />
-          <Image alt="" src={starspng} className={styles.stars} />
-          <Image alt="" src={astropng} className={styles.astro} />
-          <Image alt="" src={marspng} className={styles.mars} />
-        </div>
-        {isOpen && (
-          <div
-            className={`rounded-md ${
-              isSuccess ? "bg-green-100" : "bg-red-50"
-            } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+                Create an account
+              </Link>{" "}
+              or <span className="text-teal-700">log in</span>
+            </h6> */}
+          </div>
+          <form
+            onSubmit={handleSubmit}
+            className="mx-12 mb-8 flex max-w-4xl flex-col space-y-4 text-white md:block lg:mx-0 lg:ml-32 lg:pl-0 lg:pr-20"
           >
-            <div className="flex items-center">
-              <div className="mr-3">
-                <div
-                  className={`text-sm ${
-                    isSuccess ? "text-green-700" : "text-red-700"
-                  }`}
-                >
-                  <p>{message}</p>
+            <div className="space-y-8 ">
+              <div className="pt-1">
+                <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                  <div className="sm:col-span-5 xl:col-span-4">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      Email
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        autoComplete="email"
+                        value={values.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Email"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                        ${
+                          touched.email && errors.email
+                            ? "ring-2 ring-inset ring-red-500"
+                            : ""
+                        }`}
+                      />
+                      <span className="text-sm text-red-500">
+                        {touched.email && errors.email}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-5 xl:col-span-4">
+                    <label
+                      htmlFor="password"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      Password
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        autoComplete="password"
+                        value={values.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Password"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                        ${
+                          touched.password && errors.password
+                            ? "ring-2 ring-inset ring-red-500"
+                            : ""
+                        }`}
+                      />
+                      <span className="text-sm text-red-500">
+                        {touched.password && errors.password}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex sm:col-span-5 xl:col-span-4">
+                    <Link href="/forgotpassword" className="ml-auto">
+                      Forgot Password?
+                    </Link>
+                  </div>
                 </div>
               </div>
-              <button
-                className="flex-shrink-0"
-                onClick={() => {
-                  setIsOpen(false);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke={`${isSuccess ? "green" : "red"}`}
-                  className="h-6 w-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
             </div>
+            <button
+              disabled={isSubmitting}
+              type="submit"
+              className={`text-md rounded-md ${
+                isSubmitting
+                  ? "bg-[#288391] text-gray-400"
+                  : "bg-[#37ABBC] text-white hover:bg-[#288391]"
+              } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]`}
+            >
+              {isSubmitting ? "Logging In... " : "Log In"}
+            </button>
+            <h6 className="ml-8 font-metropolis text-xl font-extralight text-white md:inline md:text-base">
+              <span>New Here?</span>{" "}
+              <Link
+                href="/signup"
+                className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
+              >
+                Sign up
+              </Link>
+            </h6>
+          </form>
+        </div>
+        <div className="right fixed bottom-0 right-0 top-0 flex w-0 overflow-hidden lg:w-[35%]">
+          {/* <Image alt="" src={saturnpng} className="h-64 w-64" />
+          <Image alt="" src={starspng}  /> 
+          <Image alt="" src={astropng} />
+          <Image alt="" src={marspng} /> */}
+        </div>
+      </div>)}
+      {isOpen && (
+        <div
+          className={`rounded-md ${
+            isSuccess ? "bg-green-100" : "bg-red-50"
+          } fixed bottom-2 right-1/2 mx-auto translate-x-1/2 p-4`}
+        >
+          <div className="flex items-center">
+            <div className="mr-3">
+              <div
+                className={`text-sm ${
+                  isSuccess ? "text-green-700" : "text-red-700"
+                }`}
+              >
+                <p>{message}</p>
+              </div>
+            </div>
+            <button
+              className="flex-shrink-0"
+              onClick={() => {
+                setIsOpen(false);
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke={`${isSuccess ? "green" : "red"}`}
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }

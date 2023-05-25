@@ -27,7 +27,7 @@ const IdeaForm = () => {
 
   const getProject = async () => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/project/get`;
     try {
       accessToken = await getToken();
       if (!accessToken) return;
@@ -59,7 +59,7 @@ const IdeaForm = () => {
           setFirstTime(true);
           setLoading(false);
         } else {
-          void Router.push("/");
+          void Router.push("/dashboard");
         }
       }
     }
@@ -113,7 +113,7 @@ const IdeaForm = () => {
     projectDriveLink: string;
   }) => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-    const url = `http://${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
+    const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/project/${
       firstTime ? "idea" : "update"
     }`;
     try {
@@ -133,6 +133,7 @@ const IdeaForm = () => {
         setMessage("Changes saved successfully");
         setTimeout(() => {
           setIsOpen(false);
+          void Router.push("/dashboard");
         }, 2000);
       } else {
         setIsSubmitting(false);
@@ -186,16 +187,16 @@ const IdeaForm = () => {
       )}
       {!loading && (
         <main className="bg-[#242E42] text-white">
-          <div className="md:px-[8rem] px-[2rem] pb-4 pt-[4rem]">
+          <div className="px-[2rem] pb-4 pt-[4rem] md:px-[8rem]">
             <p className="text-4xl">Post your Idea</p>
           </div>
           <div className="border-[2px] border-[#37ABBC]" />
           <form
-            className="md:px-[8rem] px-[2rem]"
+            className="px-[2rem] md:px-[8rem]"
             onSubmit={formik.handleSubmit}
             noValidate
           >
-            <div className="sm:grid-cols-6 mt-6 grid grid-cols-1 gap-x-4 gap-y-6">
+            <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
               {/* projectName */}
               <div className="col-span-4">
                 <label
@@ -214,9 +215,9 @@ const IdeaForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectName}
                     placeholder="Enter your project name"
-                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
+                    className={`block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6   ${
                       formik.touched.projectName && formik.errors.projectName
-                        ? "border-2 border-red-500"
+                        ? "ring-2 ring-inset ring-red-500"
                         : ""
                     }`}
                   />
@@ -241,9 +242,9 @@ const IdeaForm = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.projectTrack}
-                    className={`sm:text-sm sm:leading-6 block rounded-md py-1.5 text-gray-900 ${
+                    className={`block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
                       formik.touched.projectTrack && formik.errors.projectTrack
-                        ? "border-b-2 border-red-500"
+                        ? "ring-2 ring-inset ring-red-500"
                         : ""
                     }`}
                   >
@@ -277,10 +278,10 @@ const IdeaForm = () => {
                     name="projectDescription"
                     placeholder="Write a brief description of your project"
                     rows={20}
-                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
+                    className={`block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6  ${
                       formik.touched.projectDescription &&
                       formik.errors.projectDescription
-                        ? "border-2 border-red-500"
+                        ? "ring-2 ring-inset ring-red-500"
                         : ""
                     }`}
                     onChange={formik.handleChange}
@@ -319,10 +320,10 @@ const IdeaForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectFigmaLink}
                     placeholder="https://www.figma.com/example"
-                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
+                    className={`block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6  ${
                       formik.touched.projectFigmaLink &&
                       formik.errors.projectFigmaLink
-                        ? "border-2 border-red-500"
+                        ? "ring-2 ring-inset ring-red-500"
                         : ""
                     }`}
                   />
@@ -358,10 +359,10 @@ const IdeaForm = () => {
                     onBlur={formik.handleBlur}
                     value={formik.values.projectDriveLink}
                     placeholder="https://www.google.com/drive/example"
-                    className={`sm:text-sm sm:leading-6 block w-full min-w-0 flex-1 rounded-lg py-1.5 text-gray-900 placeholder:text-gray-400 ${
+                    className={`block w-full min-w-0 flex-1 rounded-lg border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6  ${
                       formik.touched.projectDriveLink &&
                       formik.errors.projectDriveLink
-                        ? "border-2 border-red-500"
+                        ? "ring-2 ring-inset ring-red-500"
                         : ""
                     }`}
                   />
@@ -385,13 +386,16 @@ const IdeaForm = () => {
                     isSubmitting
                       ? "bg-[#288391] text-gray-400"
                       : "bg-[#37ABBC] text-white hover:bg-[#288391]"
-                  } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                  } px-7 py-3 font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]`}
                 >
                   {isSubmitting ? "Saving... " : "Save Changes"}
                 </button>
                 <button
+                  onClick={() => {
+                    void Router.push("/dashboard");
+                  }}
                   type="button"
-                  className="text-md ml-3 rounded-md border border-gray-300 bg-transparent px-10 py-3 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391]"
+                  className="text-md ml-3 rounded-md border border-gray-300 bg-transparent px-10 py-3 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]"
                 >
                   Cancel
                 </button>
