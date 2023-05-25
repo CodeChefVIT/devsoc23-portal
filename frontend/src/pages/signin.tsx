@@ -1,24 +1,16 @@
 /* eslint-disable @next/next/no-page-custom-font */
-// import { Inter } from "next/font/google";
-
 import { useFormik } from "formik";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios, { type AxiosError } from "axios";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type ServerResponse } from "types/api";
-// import { Router } from 'next/router';
-
 import devsocpng from "../../public/devsoc.png";
-import starspng from "../../public/stars.png";
-import saturnpng from "../../public/saturn.png";
-import astropng from "../../public/astro.png";
-import marspng from "../../public/mars.png";
-import stars from "../components/stars.svg";
 import Image from "next/image";
 import Head from "next/head";
+import getToken from "~/utils/GetAccessToken";
 
 export default function Home() {
   const router = useRouter();
@@ -26,6 +18,7 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const userSchema = z.object({
     email: z
@@ -34,14 +27,15 @@ export default function Home() {
         invalid_type_error: "Email must be a string",
       })
       .email("Enter a valid email"),
-    password: z.string({
-      required_error: "Required",
-      invalid_type_error: "Password must be a string",
-    }),
-    // .regex(
-    //   /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
-    //   "Password should contain atleast 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
-    // ),
+    password: z
+      .string({
+        required_error: "Required",
+        invalid_type_error: "Password must be a string",
+      })
+      .regex(
+        /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
+        "Password should contain atleast 8 characters, 1 uppercase, 1 lowercase, 1 number and 1 special character"
+      ),
   });
 
   const formik = useFormik({
@@ -56,10 +50,9 @@ export default function Home() {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/login`,
           values
         );
-        console.log(data);
         setIsSubmitting(false);
         setIsSuccess(true);
         setIsOpen(true);
@@ -93,10 +86,25 @@ export default function Home() {
   });
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
     formik;
+
+  useEffect(() => {
+    if (localStorage.getItem("refreshToken")) {
+      void getToken().then((res) => {
+        if (res) {
+          router.push("/dashboard");
+        } else {
+          setLoader(true);
+        }
+      });
+    } else {
+      setLoader(true);
+    }
+    //eslint-disable-next-line
+  }, []);
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Sign Up</title>
+        <title>DEVSoC&apos;23 | Sign In</title>
         <meta name="description" content="DevSoc'23 Sign Up Page" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -106,7 +114,10 @@ export default function Home() {
           rel="stylesheet"
         />
       </Head>
-      <div className="stars flex min-h-screen items-center scroll-smooth border-l-8 border-[#37ABBC]">
+      {!loader ? (<main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
+        Loading...
+      </main>) : (
+      <div className="stars flex min-h-screen items-center scroll-smooth ">
         <div className="flex w-full flex-col lg:w-[65%]">
           <Image
             src={devsocpng}
@@ -117,24 +128,24 @@ export default function Home() {
             <h1 className="font-spacegrostesk text-2xl font-bold text-white md:text-5xl ">
               Welcome to DEVSoC<span className="text-teal-500">&apos;23</span>
             </h1>
-            <h6 className="font-metropolis text-xl font-extralight text-white md:text-3xl">
+            {/* <h6 className="font-metropolis text-xl font-extralight text-white md:text-3xl">
               <Link
-                href="/signin"
+                href="/signup"
                 className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
               >
                 Create an account
               </Link>{" "}
               or <span className="text-teal-700">log in</span>
-            </h6>
+            </h6> */}
           </div>
           <form
             onSubmit={handleSubmit}
-            className="mx-12 mb-8 max-w-4xl space-y-4 text-white lg:mx-0 lg:ml-32 lg:pl-0 lg:pr-20"
+            className="mx-12 mb-8 flex max-w-4xl flex-col space-y-4 text-white md:block lg:mx-0 lg:ml-32 lg:pl-0 lg:pr-20"
           >
             <div className="space-y-8 ">
               <div className="pt-1">
                 <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-                  <div className="sm:col-span-5">
+                  <div className="sm:col-span-5 xl:col-span-4">
                     <label
                       htmlFor="email"
                       className="block text-sm font-medium leading-6 text-white"
@@ -151,7 +162,12 @@ export default function Home() {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder="Email"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                        ${
+                          touched.email && errors.email
+                            ? "ring-2 ring-inset ring-red-500"
+                            : ""
+                        }`}
                       />
                       <span className="text-sm text-red-500">
                         {touched.email && errors.email}
@@ -159,7 +175,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="sm:col-span-5">
+                  <div className="sm:col-span-5 xl:col-span-4">
                     <label
                       htmlFor="password"
                       className="block text-sm font-medium leading-6 text-white"
@@ -176,7 +192,12 @@ export default function Home() {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder="Password"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                        ${
+                          touched.password && errors.password
+                            ? "ring-2 ring-inset ring-red-500"
+                            : ""
+                        }`}
                       />
                       <span className="text-sm text-red-500">
                         {touched.password && errors.password}
@@ -184,7 +205,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex sm:col-span-5">
+                  <div className="flex sm:col-span-5 xl:col-span-4">
                     <Link href="/forgotpassword" className="ml-auto">
                       Forgot Password?
                     </Link>
@@ -193,24 +214,34 @@ export default function Home() {
               </div>
             </div>
             <button
+              disabled={isSubmitting}
               type="submit"
               className={`text-md rounded-md ${
                 isSubmitting
                   ? "bg-[#288391] text-gray-400"
                   : "bg-[#37ABBC] text-white hover:bg-[#288391]"
-              } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+              } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]`}
             >
               {isSubmitting ? "Logging In... " : "Log In"}
             </button>
+            <h6 className="ml-8 font-metropolis text-xl font-extralight text-white md:inline md:text-base">
+              <span>New Here?</span>{" "}
+              <Link
+                href="/signup"
+                className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
+              >
+                Sign up
+              </Link>
+            </h6>
           </form>
         </div>
-        <div className="fixed bottom-0 right-0 top-0 flex w-0 overflow-hidden lg:w-[35%]">
+        <div className="right fixed bottom-0 right-0 top-0 flex w-0 overflow-hidden lg:w-[35%]">
           {/* <Image alt="" src={saturnpng} className="h-64 w-64" />
           <Image alt="" src={starspng}  /> 
           <Image alt="" src={astropng} />
           <Image alt="" src={marspng} /> */}
         </div>
-      </div>
+      </div>)}
       {isOpen && (
         <div
           className={`rounded-md ${

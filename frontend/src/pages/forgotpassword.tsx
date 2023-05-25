@@ -12,11 +12,6 @@ import { type ServerResponse } from "types/api";
 // import { Router } from 'next/router';
 
 import devsocpng from "../../public/devsoc.png";
-import starspng from "../../public/stars.png";
-import saturnpng from "../../public/saturn.png";
-import astropng from "../../public/astro.png";
-import marspng from "../../public/mars.png";
-import stars from "../components/stars.svg";
 import Image from "next/image";
 import Head from "next/head";
 
@@ -47,27 +42,27 @@ export default function Home() {
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         const { data } = await axios.post<ServerResponse>(
-          `http://${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/users/forgot/mail`,
           values
         );
-        console.log(data);
         setIsSubmitting(false);
         setIsSuccess(true);
         setIsOpen(true);
-        setMessage("Logged in successfully!");
+        setMessage("OTP sent successfully!");
+        localStorage.setItem("email", values.email);
         setTimeout(() => {
           setIsOpen(false);
         }, 2000);
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/setnewpassword");
         }, 2500);
       } catch (err) {
         if (axios.isAxiosError(err)) {
           const error = err as AxiosError<ServerResponse>;
-          if (error.response?.data.err === "User not found") {
-            setMessage("User not found");
-          } else if (error.response?.data.err === "Wrong password") {
-            setMessage("Wrong password");
+          if (error.response?.data.err === "Email not found") {
+            setMessage("Email not found");
+          } else if (error.response?.data.err === "Failed to send OTP") {
+            setMessage("Failed to send OTP! Please try again later");
           } else {
             setMessage("Something went wrong. Please try again later");
           }
@@ -86,7 +81,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Sign Up</title>
+        <title>DEVSoC&apos;23 | Forgot Password</title>
         <meta name="description" content="DevSoc'23 Sign Up Page" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -96,7 +91,7 @@ export default function Home() {
           rel="stylesheet"
         />
       </Head>
-      <div className="stars flex min-h-screen items-center scroll-smooth border-l-8 border-[#37ABBC]">
+      <div className="stars flex min-h-screen items-center scroll-smooth ">
         <div className="flex w-full flex-col lg:w-[65%]">
           <Image
             src={devsocpng}
@@ -113,12 +108,12 @@ export default function Home() {
           </div>
           <form
             onSubmit={handleSubmit}
-            className="mx-12 mb-8 max-w-4xl space-y-4 text-white lg:mx-0 lg:ml-32 lg:pl-0 lg:pr-20"
+            className="mx-12 mb-8 flex max-w-4xl flex-col space-y-4 text-white md:block lg:mx-0 lg:ml-32 lg:pl-0 lg:pr-20"
           >
             <div className="space-y-8 ">
               <div className="pt-1">
                 <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-                  <div className="sm:col-span-5">
+                  <div className="sm:col-span-5 xl:col-span-4">
                     <label
                       htmlFor="email"
                       className="block text-sm font-medium leading-6 text-white"
@@ -135,7 +130,11 @@ export default function Home() {
                         onChange={handleChange}
                         onBlur={handleBlur}
                         placeholder="Email"
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
+                          touched.email && errors.email
+                            ? "ring-2 ring-inset ring-red-500"
+                            : ""
+                        }`}
                       />
                       <span className="text-sm text-red-500">
                         {touched.email && errors.email}
@@ -143,7 +142,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="flex sm:col-span-5">
+                  <div className="flex sm:col-span-5 xl:col-span-4">
                     <Link href="/signin" className="ml-auto">
                       Back to log in
                     </Link>
@@ -152,18 +151,19 @@ export default function Home() {
               </div>
             </div>
             <button
+              disabled={isSubmitting}
               type="submit"
               className={`text-md rounded-md ${
                 isSubmitting
                   ? "bg-[#288391] text-gray-400"
                   : "bg-[#37ABBC] text-white hover:bg-[#288391]"
-              } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+              } px-7 py-3 font-semibold  shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]`}
             >
               {isSubmitting ? "Sending... " : "Send OTP"}
             </button>
           </form>
         </div>
-        <div className="fixed bottom-0 right-0 top-0 flex w-0 overflow-hidden lg:w-[35%]">
+        <div className="right fixed bottom-0 right-0 top-0 flex w-0 overflow-hidden lg:w-[35%]">
           {/* <Image alt="" src={saturnpng} className="h-64 w-64" />
           <Image alt="" src={starspng}  /> 
           <Image alt="" src={astropng} />

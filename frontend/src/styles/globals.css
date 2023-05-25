@@ -7,9 +7,28 @@ body {
   color: #fff;
 }
 
-.form-error {
-  color: rgb(255, 4, 4);
+.stars {
+  background-image: url("/stars.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
+
+.right{
+  background-image: url("/right.svg");
+  background-repeat: no-repeat;
+  background-size: cover
+}
+
+.react-tel-input {
+  color: #000;
+}
+.react-tel-input .form-control {
+  width: 100% !important;
+  border-radius: 0.375rem !important;
+}
+.react-tel-input .flag-dropdown {
+  border-radius: 0.375rem 0 0 0.375rem !important;
+} 
 
 @layer base {
   @font-face {

@@ -28,6 +28,7 @@
     "react-fast-marquee": "^1.5.2",
     "react-helmet": "^6.1.0",
     "react-icons": "^4.8.0",
+    "react-phone-input-2": "^2.15.1",
     "styled-components": "^5.3.9",
     "yup": "^1.0.2",
     "zod": "^3.21.4",
