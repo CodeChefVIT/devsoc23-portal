@@ -5,7 +5,6 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import axios, { type AxiosError } from "axios";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { type ServerResponse } from "types/api";
 import devsocpng from "../../public/devsoc.png";
