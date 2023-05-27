@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import React from "react";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import { IconContext } from "react-icons";
-import FormData from "form-data";
+// import FormData from "form-data";
 import { useFormik } from "formik";
 // import { type Dayjs } from "dayjs";
 // import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -18,6 +18,7 @@ import { type ServerResponse } from "types/api";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Head from "next/head";
+import Loader from "~/components/Loader";
 
 interface Values {
   firstName: string;
@@ -32,6 +33,7 @@ interface Values {
   mode: string;
   github: string;
   image: File | undefined;
+  otherCollege: string;
 }
 
 function Profile() {
@@ -48,6 +50,7 @@ function Profile() {
     mode: "Choose",
     github: "",
     image: undefined,
+    otherCollege: "",
   };
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +58,7 @@ function Profile() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [message, setMessage] = useState("");
   const [isVITian, setIsVITian] = useState(false);
+  const [isOtherCollege, setIsOtherCollege] = useState(false);
 
   let accessToken: string | undefined = "";
   // const [dob, setValue] = React.useState<Dayjs | null>(null);
@@ -96,7 +100,6 @@ function Profile() {
         required_error: "Required",
         invalid_type_error: "Last name must be a string",
       })
-      .min(2, "Last name must have min 2 chars")
       .max(20, "Last name must have max 20 chars"),
     phoneNumber: z
       .string({
@@ -186,16 +189,29 @@ function Profile() {
         values.github = data.user.github;
         console.log(data.user.image);
         setPreview(data.user.image);
-        void formik.setValues(values);
         if (values.college === "VIT Vellore") {
           setIsVITian(true);
           values.mode = "offline";
+        } else {
+          setIsVITian(false);
+          values.college = "Others";
+          setIsOtherCollege(true);
+          values.otherCollege = data.user.college;
         }
+        void formik.setValues(values);
         setLoading(false);
       } else {
         setLoading(false);
       }
     } catch (err) {
+      setLoading(false);
+      setIsOpen(true);
+      setIsSuccess(false);
+      setMessage("Something went wrong. Please try again later");
+      setTimeout(() => {
+        setIsOpen(false);
+        void Router.push("/dashboard");
+      }, 2000);
       // console.log("err");
       // void Router.push("../");
     }
@@ -215,20 +231,23 @@ function Profile() {
     image: File | undefined;
   }) => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-    const formData = new FormData();
+    // const formData = new FormData();
     // const x = `+${values.phoneNumber as string}`;
     // console.log(x);
-    formData.append("firstName", values.firstName);
-    formData.append("lastName", values.lastName);
-    formData.append("bio", values.bio);
-    formData.append("email", values.email);
-    formData.append("phoneNumber", `+${values.phoneNumber as string}`);
-    formData.append("gender", values.gender);
-    formData.append("college", values.college);
-    formData.append("birthDate", values.birthDate);
-    formData.append("mode", values.mode);
-    formData.append("github", values.github);
-    formData.append("image", values.image);
+    // formData.append("firstName", values.firstName);
+    // formData.append("lastName", values.lastName);
+    // formData.append("bio", values.bio);
+    // formData.append("email", values.email);
+    // formData.append("phoneNumber", `+${values.phoneNumber as string}`);
+    // formData.append("gender", values.gender);
+    // formData.append("birthDate", values.birthDate);
+    // formData.append("mode", values.mode);
+    // formData.append("github", values.github);
+    // formData.append("image", values.image);
+    if (formik.values.college === "Others") {
+      // console.log(values.otherCollege);
+      values.college = formik.values.otherCollege;
+    } else values.college = formik.values.college;
     // console.log(formData);
     const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/users/update`;
     try {
@@ -259,6 +278,7 @@ function Profile() {
         setMessage("Changes saved successfully");
         setTimeout(() => {
           setIsOpen(false);
+          void Router.push("/dashboard");
         }, 2000);
       } else {
         setIsSubmitting(false);
@@ -276,6 +296,7 @@ function Profile() {
       setMessage("Something went wrong. Please try again later");
       setTimeout(() => {
         setIsOpen(false);
+        void Router.reload();
       }, 2000);
     }
   };
@@ -327,6 +348,11 @@ function Profile() {
     }
 
     const file = e.target.files[0];
+    const type = file?.type;
+    if (!type?.match(/^image\/[a-zA-Z]*$/)) {
+      alert("Please upload an image");
+      return;
+    }
 
     setSelectedFile(file);
 
@@ -344,9 +370,11 @@ function Profile() {
   useEffect(() => {
     if (formik.values.college === "VIT Vellore") {
       setIsVITian(true);
+      setIsOtherCollege(false);
       void formik.setFieldValue("mode", "offline");
-    } else {
+    } else if (formik.values.college === "Others") {
       setIsVITian(false);
+      setIsOtherCollege(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.college]);
@@ -360,11 +388,11 @@ function Profile() {
       <Head>
         <title>DEVSoC&apos;23 | Profile</title>
         <meta name="description" content="DevSoc'23 Sign Up Page" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/devsoc.png" />
       </Head>
       {loading && (
         <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
-          Loading...
+          <Loader />
         </main>
       )}
       {!loading && (
@@ -410,6 +438,7 @@ function Profile() {
                     <input
                       type="file"
                       id="upload"
+                      accept="image/*"
                       className="ml-5 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                       onChange={onSelectFile}
                       hidden
@@ -753,6 +782,38 @@ function Profile() {
                       </span>
                     </div>
                   </div>
+
+                  {isOtherCollege ? (
+                    <div className="sm:col-span-6">
+                      <label
+                        htmlFor="otherCollege"
+                        className="block text-sm font-medium leading-6 text-white"
+                      >
+                        College Name
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="otherCollege"
+                          id="otherCollege"
+                          value={values.otherCollege}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          placeholder="College Name"
+                          className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                      ${
+                        touched.otherCollege && errors.otherCollege
+                          ? "ring-2 ring-inset ring-red-500"
+                          : ""
+                      }`}
+                        />
+
+                        <span className="text-sm text-red-500">
+                          {touched.otherCollege && errors.otherCollege}
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

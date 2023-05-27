@@ -21,6 +21,7 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isOtherCollege, setIsOtherCollege] = useState(false);
 
   const userSchema = z
     .object({
@@ -36,7 +37,6 @@ export default function Home() {
           required_error: "Required",
           invalid_type_error: "Last name must be a string",
         })
-        .min(2, "Last name must have min 2 chars")
         .max(20, "Last name must have max 20 chars"),
       email: z
         .string({
@@ -73,7 +73,7 @@ export default function Home() {
           required_error: "Required",
           invalid_type_error: "Bio must be a string",
         })
-        .min(100, "Bio must have min 100 chars")
+        .min(40, "Bio must have min 40 chars")
         .max(500, "Bio must have max 500 chars"),
       college: z.literal("VIT Vellore").or(z.literal("Others")),
       birthDate: z
@@ -113,16 +113,32 @@ export default function Home() {
       birthDate: "",
       mode: "",
       github: "",
+      otherCollege: "",
     },
     validationSchema: toFormikValidationSchema(userSchema),
     validateOnChange: true,
     onSubmit: async (values) => {
       setIsSubmitting(true);
+      const send = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        phoneNumber: values.phoneNumber,
+        gender: values.gender,
+        bio: values.bio,
+        birthDate: values.birthDate,
+        mode: values.mode,
+        github: values.github,
+        college: "",
+      };
+      if (values.college === "Others") send.college = values.otherCollege;
+      else send.college = values.college;
       try {
         if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
         await axios.post<ServerResponse>(
           `${process.env.NEXT_PUBLIC_SERVER_URL}/users/signup`,
-          values
+          send
         );
         setIsSubmitting(false);
         setIsSuccess(true);
@@ -156,9 +172,11 @@ export default function Home() {
   useEffect(() => {
     if (formik.values.college === "VIT Vellore") {
       setIsVITian(true);
+      setIsOtherCollege(false);
       void formik.setFieldValue("mode", "offline");
-    } else {
+    } else if (formik.values.college === "Others") {
       setIsVITian(false);
+      setIsOtherCollege(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.college]);
@@ -170,13 +188,14 @@ export default function Home() {
       <Head>
         <title>DEVSoC&apos;23 | Sign Up</title>
         <meta name="description" content="DevSoc'23 Sign Up Page" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/devsoc.png" id="favicon" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
           href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap"
           rel="stylesheet"
         />
+        <script></script>
       </Head>
       <div className="stars flex min-h-screen items-center scroll-smooth ">
         <div className="flex w-full flex-col lg:w-[65%]">
@@ -403,18 +422,28 @@ export default function Home() {
                       value={values.gender}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
+                      required
+                      className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
                         touched.gender && errors.gender
                           ? "ring-2 ring-inset ring-red-500"
                           : ""
                       }`}
                     >
                       <option disabled value="" label="Choose your gender" />
-                      <option value="Male" label="Male" />
-                      <option value="Female" label="Female" />
+                      <option
+                        value="Male"
+                        label="Male"
+                        className="text-black"
+                      />
+                      <option
+                        value="Female"
+                        label="Female"
+                        className="text-black"
+                      />
                       <option
                         value="Prefer Not to Say"
                         label="Prefer Not to Say"
+                        className="text-black"
                       />
                     </select>
                     <span className="text-sm text-red-500">
@@ -435,6 +464,7 @@ export default function Home() {
                       type="date"
                       name="birthDate"
                       id="birthDate"
+                      autoComplete="birthDate"
                       value={values.birthDate}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -526,6 +556,7 @@ export default function Home() {
                     <select
                       id="college"
                       name="college"
+                      required
                       value={values.college}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -540,8 +571,16 @@ export default function Home() {
                         value=""
                         label="Choose your university"
                       />
-                      <option value="VIT Vellore" label="VIT Vellore" />
-                      <option value="Others" label="Other" />
+                      <option
+                        value="VIT Vellore"
+                        label="VIT Vellore"
+                        className="text-black"
+                      />
+                      <option
+                        value="Others"
+                        label="Other"
+                        className="text-black"
+                      />
                     </select>
                     <span className="text-sm text-red-500">
                       {touched.college && errors.college}
@@ -561,6 +600,7 @@ export default function Home() {
                       disabled={isVITian}
                       id="mode"
                       name="mode"
+                      required
                       value={values.mode}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -575,14 +615,54 @@ export default function Home() {
                         value=""
                         label="Choose your mode of participation"
                       />
-                      <option value="online" label="Online" />
-                      <option value="offline" label="Offline" />
+                      <option
+                        value="online"
+                        label="Online"
+                        className="text-black"
+                      />
+                      <option
+                        value="offline"
+                        label="Offline"
+                        className="text-black"
+                      />
                     </select>
                     <span className="text-sm text-red-500">
                       {touched.mode && errors.mode}
                     </span>
                   </div>
                 </div>
+
+                {isOtherCollege ? (
+                  <div className="sm:col-span-6">
+                    <label
+                      htmlFor="otherCollege"
+                      className="block text-sm font-medium leading-6 text-white"
+                    >
+                      College Name
+                    </label>
+                    <div className="mt-2">
+                      <input
+                        type="text"
+                        name="otherCollege"
+                        id="otherCollege"
+                        value={values.otherCollege}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="College Name"
+                        className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                      ${
+                        touched.otherCollege && errors.otherCollege
+                          ? "ring-2 ring-inset ring-red-500"
+                          : ""
+                      }`}
+                      />
+
+                      <span className="text-sm text-red-500">
+                        {touched.otherCollege && errors.otherCollege}
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 
@@ -601,7 +681,7 @@ export default function Home() {
               <span>Have an account?</span>{" "}
               <Link
                 href="/signin"
-                className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
+                className="delay-70 text-[#288391] ease-in-out hover:text-[#288391] hover:transition"
               >
                 Log in
               </Link>

@@ -7,6 +7,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import getToken from "~/utils/GetAccessToken";
 import axios, { type AxiosError } from "axios";
 import { type ServerResponse } from "types/api";
+import Loader from "~/components/Loader";
 
 const IdeaForm = () => {
   const initialValues = {
@@ -93,7 +94,8 @@ const IdeaForm = () => {
         invalid_type_error: "Figma link must be a string",
       })
       .url({ message: "Please enter a valid url" })
-      .includes("figma.com", { message: "Please enter a figma link" }),
+      .includes("figma.com", { message: "Please enter a figma link" })
+      .or(z.string().regex(/^NA$/)),
     projectDriveLink: z
       .string({
         required_error: "Google Drive link is required",
@@ -102,7 +104,8 @@ const IdeaForm = () => {
       .url({ message: "Please enter a valid url" })
       .includes("google.com", {
         message: "Please enter a google drive link",
-      }),
+      })
+      .or(z.string().regex(/^NA$/)),
   });
 
   const submitProject = async (values: {
@@ -176,13 +179,13 @@ const IdeaForm = () => {
   return (
     <>
       <Head>
-        <title>DEVSOC&apos;23 | Idea Submission</title>
+        <title>DEVSoC&apos;23 | Idea Submission</title>
         <meta name="description" content="Idea Submission for DEVSOC'23" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/devsoc.png" id="favicon" />
       </Head>
       {loading && (
         <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
-          Loading...
+          <Loader />
         </main>
       )}
       {!loading && (
@@ -239,6 +242,7 @@ const IdeaForm = () => {
                   <select
                     id="projectTrack"
                     name="projectTrack"
+                    required
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.projectTrack}

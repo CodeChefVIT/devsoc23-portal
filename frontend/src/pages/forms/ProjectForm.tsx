@@ -8,6 +8,7 @@ import Router from "next/router";
 import getToken from "~/utils/GetAccessToken";
 import axios from "axios";
 import { type ServerResponse } from "types/api";
+import Loader from "~/components/Loader";
 
 const ProjectForm = () => {
   const initialValues = {
@@ -110,13 +111,15 @@ const ProjectForm = () => {
         invalid_type_error: "Figma link must be a string",
       })
       .url({ message: "Please enter a valid url" })
-      .includes("figma.com", { message: "Please enter a figma link" }),
+      .includes("figma.com", { message: "Please enter a figma link" })
+      .or(z.string().regex(/^NA$/)),
     projectVideoLink: z
       .string({
         required_error: "Video link is required",
         invalid_type_error: "Video link must be a string",
       })
-      .url({ message: "Please enter a valid url" }),
+      .url({ message: "Please enter a valid url" })
+      .or(z.string().regex(/^NA$/)),
     projectDriveLink: z
       .string({
         required_error: "Google Drive link is required",
@@ -125,7 +128,8 @@ const ProjectForm = () => {
       .url({ message: "Please enter a valid url" })
       .includes("google.com", {
         message: "Please enter a google drive link",
-      }),
+      })
+      .or(z.string().regex(/^NA$/)),
   });
 
   const submitProject = async (values: {
@@ -198,13 +202,13 @@ const ProjectForm = () => {
   return (
     <>
       <Head>
-        <title>DEVSOC&apos;23 | Project Submission</title>
-        <meta name="description" content="Idea Submission for DEVSOC'23" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>DEVSoC&apos;23 | Project Submission</title>
+        <meta name="description" content="Project Submission for DEVSOC'23" />
+        <link rel="icon" href="/devsoc.png" id="favicon" />
       </Head>
       {loading && (
         <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
-          Loading...
+          <Loader />
         </main>
       )}
       {!loading && (
@@ -260,6 +264,7 @@ const ProjectForm = () => {
                   <select
                     id="projectTrack"
                     name="projectTrack"
+                    required
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.projectTrack}
@@ -503,7 +508,8 @@ const ProjectForm = () => {
                   Video Link*
                 </label>
                 <p className="mt-2 pb-1 text-sm text-gray-300">
-                  Share a short video demonstarting your project.
+                  Share a short video demonstarting your project (Enter NA if
+                  not applicable).
                 </p>
                 <div className="mt-2 flex rounded-lg shadow-sm">
                   <input
@@ -586,7 +592,9 @@ const ProjectForm = () => {
                   {isSubmitting ? "Saving... " : "Save Changes"}
                 </button>
                 <button
-                onClick={()=>{void Router.push('/dashboard')}}
+                  onClick={() => {
+                    void Router.push("/dashboard");
+                  }}
                   type="button"
                   className="text-md ml-3 rounded-md border border-gray-300 bg-transparent px-10 py-3 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]"
                 >

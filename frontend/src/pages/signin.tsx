@@ -11,6 +11,7 @@ import devsocpng from "../../public/devsoc.png";
 import Image from "next/image";
 import Head from "next/head";
 import getToken from "~/utils/GetAccessToken";
+import Loader from "~/components/Loader";
 
 export default function Home() {
   const router = useRouter();
@@ -151,7 +152,7 @@ export default function Home() {
       <Head>
         <title>DEVSoC&apos;23 | Sign In</title>
         <meta name="description" content="DevSoc'23 Sign Up Page" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/devsoc.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
@@ -161,7 +162,7 @@ export default function Home() {
       </Head>
       {!loader ? (
         <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
-          Loading...
+          <Loader />
         </main>
       ) : (
         <div className="stars flex min-h-screen items-center scroll-smooth ">
@@ -293,7 +294,7 @@ export default function Home() {
                 <span>New Here?</span>{" "}
                 <Link
                   href="/signup"
-                  className="delay-70 ease-in-out hover:text-teal-500 hover:transition"
+                  className="delay-70 ease-in-out text-[#288391] hover:text-[#288391] hover:transition"
                 >
                   Sign up
                 </Link>

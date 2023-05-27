@@ -4,7 +4,7 @@ import Router from "next/router";
 import { useEffect } from "react";
 import Loader from "~/components/Loader";
 
-const Home: NextPage = () => {
+const Error: NextPage = () => {
   useEffect(() => {
     void Router.push("/signin");
   }, []);
@@ -23,4 +23,5 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Error;
+    
