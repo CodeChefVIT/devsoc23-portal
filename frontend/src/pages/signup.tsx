@@ -195,7 +195,6 @@ export default function Home() {
           href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap"
           rel="stylesheet"
         />
-        <script></script>
       </Head>
       <div className="stars flex min-h-screen items-center scroll-smooth ">
         <div className="flex w-full flex-col lg:w-[65%]">
