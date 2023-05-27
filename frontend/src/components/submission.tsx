@@ -106,7 +106,7 @@ const Submission = () => {
             </p> */}
               </div>
               <div className="flex gap-5 py-4">
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
                       <p>{timeLeft.days}</p>
@@ -114,7 +114,7 @@ const Submission = () => {
                   </span>
                   <p>days</p>
                 </div>
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
                       <p>{timeLeft.hours}</p>
@@ -122,7 +122,7 @@ const Submission = () => {
                   </span>
                   <p>hours</p>
                 </div>
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
                       <p>{timeLeft.minutes}</p>
@@ -130,7 +130,7 @@ const Submission = () => {
                   </span>
                   <p>minutes</p>
                 </div>
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
                       <p>{timeLeft.seconds}</p>
