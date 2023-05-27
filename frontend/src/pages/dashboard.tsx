@@ -200,13 +200,13 @@ const Dashboard = () => {
           className="mb-5 flex w-full flex-row items-center justify-between rounded-2xl bg-[#20293C] py-5 pl-5 pr-6 md:pl-10 md:pr-20 lg:pl-10 lg:pr-20"
         >
           <div className="mr-20 flex flex-row items-center md:mr-20">
-            <Image
+            {/* <Image
               src={Profile as StaticImageData}
               alt=""
               className="h-15 w-15 mr-3"
               width={40}
               height={40}
-            />
+            /> */}
             <p className="w-fit text-lg font-bold text-[#61BFE7] md:text-xl lg:text-xl">
               {member.firstName.toUpperCase()} {member.lastName.toUpperCase()}
             </p>
