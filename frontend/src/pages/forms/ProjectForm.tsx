@@ -508,7 +508,7 @@ const ProjectForm = () => {
                   Video Link*
                 </label>
                 <p className="mt-2 pb-1 text-sm text-gray-300">
-                  Share a short video demonstarting your project (Enter NA if
+                  Share a short video demonstrating your project (Enter NA if
                   not applicable).
                 </p>
                 <div className="mt-2 flex rounded-lg shadow-sm">

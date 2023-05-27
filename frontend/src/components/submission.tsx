@@ -101,9 +101,6 @@ const Submission = () => {
                 <p className="pb-3 pt-8 text-2xl font-bold text-white">
                   Idea Submission
                 </p>
-                {/* <p className="pb-5 pt-2 text-2xl font-bold text-white md:pt-8 lg:pt-8">
-              8 Hours Remaining
-            </p> */}
               </div>
               <div className="flex gap-5 py-4">
                 <div className="flex flex-row items-end gap-2">
@@ -140,11 +137,6 @@ const Submission = () => {
                 </div>
               </div>
               <div className="flex w-full flex-col rounded-2xl bg-[#2F3B52] p-5">
-                {/* <Image
-                  src={submission as StaticImageData}
-                  alt=""
-                  className="w-full"
-                /> */}
                 <div className="inset-0 flex flex-col rounded-2xl bg-[#20293C] px-5 py-5">
                   <p className="w-fit text-lg font-bold text-[#61BFE7] md:text-xl lg:text-xl">
                     {ideaName === ""
