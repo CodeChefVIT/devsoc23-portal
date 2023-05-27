@@ -119,9 +119,9 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Forgot Password</title>
-        <meta name="description" content="DevSoc'23 Sign Up Page" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>DEVSoC&apos;23 | Reset Password</title>
+        <meta name="description" content="DEVSoC'23 Reset Password Page" />
+        <link rel="icon" href="/devsoc.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link

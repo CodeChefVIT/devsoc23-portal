@@ -66,8 +66,8 @@ export default function Home() {
     <>
       <Head>
         <title>DEVSoC&apos;23 | Verify User</title>
-        <meta name="description" content="DevSoc'23 Sign Up Page" />
-        <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="DevSoc'23 Verify User Page" />
+        <link rel="icon" href="/devsoc.png" />
       </Head>
       <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">
         <button
