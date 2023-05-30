@@ -22,6 +22,26 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isOtherCollege, setIsOtherCollege] = useState(false);
+  const [age, setAge] = useState(21);
+
+  const calculateAge = () => {
+    const now = new Date(); //getting current date
+    const currentY = now.getFullYear(); //extracting year from the date
+    // const currentM = now.getMonth(); //extracting month from the date
+
+    const dobget: string = (
+      document.getElementById("birthDate") as HTMLInputElement
+    ).value; //getting user input
+    const dob = new Date(dobget); //formatting input as date
+    const prevY = dob.getFullYear(); //extracting year from input date
+    // const prevM = dob.getMonth(); //extracting month from input date
+
+    const age = currentY - prevY;
+    // const ageM = Math.abs(currentM - prevM); //converting any negative value to positive
+
+    setAge(age);
+    return;
+  };
 
   const userSchema = z
     .object({
@@ -119,6 +139,10 @@ export default function Home() {
     validationSchema: toFormikValidationSchema(userSchema),
     validateOnChange: true,
     onSubmit: async (values) => {
+      if (age < 16) {
+        alert("You must be atleast 16 years old to register for DEVSOC'23");
+        return;
+      }
       setIsSubmitting(true);
       const send = {
         firstName: values.firstName,
@@ -206,7 +230,7 @@ export default function Home() {
           />
           <div className="mx-auto mt-24 lg:ml-32 lg:mr-0">
             <h1 className="font-spacegrostesk text-2xl font-bold text-white md:text-5xl ">
-              Welcome to DEVSoC<span className="text-teal-500">&apos;23</span>
+              Welcome to DEVSOC<span className="text-teal-500">&apos;23</span>
             </h1>
             {/* <h6 className="font-metropolis text-xl font-extralight text-white md:text-3xl">
               <span className="text-teal-700">Create an account</span> or{" "}
@@ -466,7 +490,10 @@ export default function Home() {
                       id="birthDate"
                       autoComplete="birthDate"
                       value={values.birthDate}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        calculateAge();
+                      }}
                       onBlur={handleBlur}
                       className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
                         touched.birthDate && errors.birthDate

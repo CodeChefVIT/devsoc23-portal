@@ -10,7 +10,7 @@ import Devsoc from "./../../assets/logo.png";
 // import Profile from "./../../assets/user-avatar.svg";
 import Crown from "./../../assets/crown.svg";
 import Leave from "./../../assets/leave.svg";
-import Edit from "./../../assets/edit.svg";
+// import Edit from "./../../assets/edit.svg";
 import Submission from "../components/submission";
 // import Tracks from "./../components/tracks";
 import getToken from "~/utils/GetAccessToken";
@@ -54,7 +54,7 @@ const Dashboard = () => {
   const [data, setData] = useState<ServerResponse | Record<string, never>>({});
   const [teamLeaderId, setTeamLeaderId] = useState("");
   const [isdisabled, setIsDisabled] = useState(false);
-  const [isTeamNameValid, setIsTeamNameValid] = useState(true);
+  // const [isTeamNameValid, setIsTeamNameValid] = useState(true);
 
   // toggle states
   const [teamCode, setTeamCode] = useState("");
@@ -73,15 +73,15 @@ const Dashboard = () => {
 
   let token: string | undefined = "";
 
-  const handleEditClick = () => {
-    setEditMode(true);
-  };
+  // const handleEditClick = () => {
+  //   setEditMode(true);
+  // };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value.length > 15 || event.target.value.length < 3) {
-      setIsTeamNameValid(false);
-      return;
-    }
+    // if (event.target.value.length > 15 || event.target.value.length < 3) {
+    //   setIsTeamNameValid(false);
+    //   return;
+    // }
     setTeamName(event.target.value);
   };
 
@@ -183,7 +183,7 @@ const Dashboard = () => {
           setIsleader(response.data.isTeamLeader);
           setTeamId(response.data.teamId);
           setTeamLeaderId(response.data.teamLeader);
-          setLoading(false);
+          // setLoading(false);
         } else {
           throw new Error("Couldn't fetch team data!");
         }
@@ -199,8 +199,12 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken]);
 
+  useEffect(() => {
+    setLoading(false)
+  }, [data]);
+
   const items: ReactNode = hasTeam
-    ? data.memberDetails.map((member: Member) => (
+    ? data?.memberDetails.map((member: Member) => (
         <div
           key={member.Id}
           className="mb-5 flex w-full flex-row items-center justify-between rounded-2xl bg-[#20293C] py-5 pl-5 pr-6 md:pl-10 md:pr-20 lg:pl-10 lg:pr-20"

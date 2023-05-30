@@ -102,15 +102,17 @@ const Submission = () => {
                   Idea Submission
                 </p>
               </div>
-              <div className="flex gap-5 py-4">
-                <div className="flex flex-row items-end gap-2">
-                  <span className="font-mono text-4xl ">
-                    <span>
-                      <p>{timeLeft.days}</p>
+              <div className="flex flex-wrap gap-5 py-4">
+                {timeLeft.days === 0 ? null : (
+                  <div className="flex flex-row items-end gap-2">
+                    <span className="font-mono text-4xl ">
+                      <span>
+                        <p>{timeLeft.days}</p>
+                      </span>
                     </span>
-                  </span>
-                  <p>days</p>
-                </div>
+                    <p>days</p>
+                  </div>
+                )}
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
@@ -143,7 +145,10 @@ const Submission = () => {
                       ? "No idea submitted"
                       : `${ideaName.toUpperCase()}`}
                   </p>
-                  <p>{ideaDesc === "" ? "" : `${ideaDesc}...`}</p>
+                  <p className="break-all">
+                    {ideaDesc === "" ? "" : `${ideaDesc}...`}
+                  </p>
+                  {/* <p className="block md:hidden">{ideaDescMob === "" ? "" : `${ideaDescMob}...`}</p> */}
                 </div>
                 <button
                   type="button"
