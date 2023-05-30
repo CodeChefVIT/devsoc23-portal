@@ -429,8 +429,9 @@ function Profile() {
                         <Image
                           alt="preview"
                           src={preview as string}
-                          height={48}
-                          width={48}
+                          height={40}
+                          width={40}
+                          className="h-full w-full rounded-full"
                           // className="h-12 w-12"
                         />
                       )}

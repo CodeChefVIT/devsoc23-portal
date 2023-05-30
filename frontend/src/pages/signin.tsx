@@ -174,7 +174,7 @@ export default function Home() {
             />
             <div className="mx-12 mt-24 lg:ml-32 lg:mr-0">
               <h1 className="font-spacegrostesk text-2xl font-bold text-white md:text-5xl ">
-                Welcome to DEVSoC<span className="text-teal-500">&apos;23</span>
+                Welcome to DEVSOC<span className="text-teal-500">&apos;23</span>
               </h1>
               {/* <h6 className="font-metropolis text-xl font-extralight text-white md:text-3xl">
               <Link
