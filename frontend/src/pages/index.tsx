@@ -12,8 +12,8 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23</title>
-        <meta name="description" content="DevSoc'23" />
+        <title>DEVSOC&apos;23</title>
+        <meta name="description" content="DEVSOC'23" />
         <link rel="icon" href="/devsoc.png" />
       </Head>
       <main className="absolute inset-0 flex items-center justify-center bg-[#242E42] text-white">

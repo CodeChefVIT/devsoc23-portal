@@ -113,7 +113,7 @@ export default function Home() {
           if (error.response?.data.err === "User not found") {
             setMessage("User not found");
           } else if (error.response?.data.err === "User not verified") {
-            setMessage("User not verified");
+            setMessage("User not verified! Please verify your email.");
             setIsVerified(false);
           } else if (error.response?.data.err === "Wrong password") {
             setMessage("Wrong password");
@@ -150,8 +150,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Sign In</title>
-        <meta name="description" content="DevSoc'23 Sign Up Page" />
+        <title>DEVSOC&apos;23 | Sign In</title>
+        <meta name="description" content="DEVSOC'23 Sign In Page" />
         <link rel="icon" href="/devsoc.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -271,7 +271,7 @@ export default function Home() {
                 isVerified ? "hidden" : ""
               }  text-md rounded-md border border-gray-300 bg-transparent px-10 py-3 font-semibold shadow-sm hover:border-transparent hover:bg-[#288391] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#37ABBC]`}
               >
-                {isResending ? "Resending OTP..." : "Resend OTP"}
+                {isResending ? "Resending..." : "Resend Verification Mail"}
               </button>
               <br />
               <button

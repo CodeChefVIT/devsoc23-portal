@@ -7,7 +7,7 @@ import { HiCheck } from "react-icons/hi";
 
 import Devsoc from "./../../assets/logo.png";
 
-import Profile from "./../../assets/user-avatar.svg";
+// import Profile from "./../../assets/user-avatar.svg";
 import Crown from "./../../assets/crown.svg";
 import Leave from "./../../assets/leave.svg";
 import Edit from "./../../assets/edit.svg";
@@ -54,6 +54,7 @@ const Dashboard = () => {
   const [data, setData] = useState<ServerResponse | Record<string, never>>({});
   const [teamLeaderId, setTeamLeaderId] = useState("");
   const [isdisabled, setIsDisabled] = useState(false);
+  const [isTeamNameValid, setIsTeamNameValid] = useState(true);
 
   // toggle states
   const [teamCode, setTeamCode] = useState("");
@@ -77,6 +78,10 @@ const Dashboard = () => {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value.length > 15 || event.target.value.length < 3) {
+      setIsTeamNameValid(false);
+      return;
+    }
     setTeamName(event.target.value);
   };
 
@@ -103,7 +108,7 @@ const Dashboard = () => {
 
         if (response.status === 200) {
           setEditMode(false);
-          console.log("Successfully updated team!");
+          // console.log("Successfully updated team!");
         } else {
           throw new Error("Failed to update team");
         }
@@ -170,7 +175,7 @@ const Dashboard = () => {
         });
 
         if (response.status === 200) {
-          console.log(data);
+          // console.log(data);
           setData(response.data);
           setHasTeam(response.data.inTeam);
           setTeamName(response.data.teamName);
@@ -232,7 +237,7 @@ const Dashboard = () => {
       setIsDisabled(true);
       const postData = async () => {
         try {
-          console.log("send");
+          // console.log("send");
           setJoinTeam("Joining...");
           if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
           if (!accessToken) return;
@@ -300,15 +305,15 @@ const Dashboard = () => {
   const handleClick = () => {
     try {
       void navigator.clipboard.writeText(inviteCode);
-      console.log("Text copied to clipboard:", inviteCode);
+      // console.log("Text copied to clipboard:", inviteCode);
     } catch (err) {
-      console.error("Failed to copy text:", err);
+      // console.error("Failed to copy text:", err);
     }
   };
 
   const handleLeaveTeam = () => {
     const confirm = window.confirm("Are you sure you want leave the team?");
-    console.log(confirm);
+    // console.log(confirm);
     if (!confirm) return;
     async function leave() {
       try {
@@ -331,7 +336,7 @@ const Dashboard = () => {
         if (response.status === 200) {
           setEditMode(false);
           setHasTeam(!hasTeam);
-          console.log("Successfully left team!");
+          // console.log("Successfully left team!");
         } else {
           throw new Error("Failed to leave team");
         }
@@ -378,75 +383,92 @@ const Dashboard = () => {
 
   const handleCreateTeam = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    async function create() {
-      console.log(teamName);
-      try {
-        if (teamName.length === 0) return;
-        console.log(accessToken);
-        setTextCreate("Creating...");
-        if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
-        if (!accessToken) return;
+    // console.log("team: " + teamName);
+    if (teamName === undefined || teamName.length === 0) {
+      alert("Team Name cannot be null!");
+      return;
+    } else if (teamName.length > 15) {
+      alert("Team Name cannot be more than 15 characters");
+      return;
+    } else {
+      const confirm = window.confirm(
+        "Your team name will be: " +
+          teamName +
+          "\nAre you sure you want to create this team? \n(You cannot change your team name later)"
+      );
 
-        const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/team/create`;
+      if (!confirm) return;
 
-        const response = await axios.post<ServerResponse>(
-          url,
-          { teamName: teamName },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        console.log(response.data);
+      async function create() {
+        // console.log(teamName);
+        try {
+          if (teamName.length === 0) return;
+          // console.log(accessToken);
+          setTextCreate("Creating...");
+          if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
+          if (!accessToken) return;
 
-        if (response.status === 200) {
-          setTextCreate("Created!");
-          setTeamName("");
-          setJoinTeam("Successfully joined team!");
-          setHasTeam(!hasTeam);
-          setIsSnackbarOpen(true);
-          setIsSuccess(true);
-          setMessage("Team created successfully!");
-          window.location.reload();
-        } else {
-          throw new Error("Failed to join team");
-        }
-      } catch (err) {
-        setIsSnackbarOpen(true);
-        setIsSuccess(false);
-        setTextCreate("Create");
-        if (axios.isAxiosError(err)) {
-          const error = err as AxiosError<ServerResponse>;
-          if (error.response?.data.err === "User not found") {
-            setMessage("User not found");
-          } else if (error.response?.data.err === "Already in team") {
-            setMessage("You are already in a team");
-          } else if (error.response?.data.err === "Name already exists") {
-            setMessage("Team Name already exists");
-          } else if (
-            error.response?.data.err ===
-            "you cannot invite yourself for your team"
-          ) {
-            setMessage("You cannot invite yourself for your team");
-          } else if (error.response?.data.err === "Team is full") {
-            setMessage("Team is full");
+          const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/team/create`;
+
+          const response = await axios.post<ServerResponse>(
+            url,
+            { teamName: teamName },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+          // console.log(response.data);
+
+          if (response.status === 200) {
+            setTextCreate("Created!");
+            setTeamName("");
+            setJoinTeam("Successfully joined team!");
+            setHasTeam(!hasTeam);
+            setIsSnackbarOpen(true);
+            setIsSuccess(true);
+            setMessage("Team created successfully!");
+            window.location.reload();
           } else {
-            setMessage("Something went wrong");
+            throw new Error("Failed to join team");
+          }
+        } catch (err) {
+          setIsSnackbarOpen(true);
+          setIsSuccess(false);
+          setTextCreate("Create");
+          if (axios.isAxiosError(err)) {
+            const error = err as AxiosError<ServerResponse>;
+            if (error.response?.data.err === "User not found") {
+              setMessage("User not found");
+            } else if (error.response?.data.err === "Already in team") {
+              setMessage("You are already in a team");
+            } else if (error.response?.data.err === "Name already exists") {
+              setMessage("Team Name already exists");
+            } else if (
+              error.response?.data.err ===
+              "you cannot invite yourself for your team"
+            ) {
+              setMessage("You cannot invite yourself for your team");
+            } else if (error.response?.data.err === "Team is full") {
+              setMessage("Team is full");
+            } else {
+              setMessage("Something went wrong");
+            }
           }
         }
       }
-    }
 
-    void create();
+      void create();
+    }
   };
 
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Dashboard</title>
-        <meta name="description" content="DEVSoC'23 Dashboard" />
+        <title>DEVSOC&apos;23 | Dashboard</title>
+        <meta name="description" content="DEVSOC'23 Dashboard" />
         <link rel="icon" href="/devsoc.png" id="favicon" />
       </Head>
       {loading && (
@@ -462,7 +484,11 @@ const Dashboard = () => {
             </Link>
             <div>
               <div className="flex flex-row items-center justify-between gap-4">
-                <Link className="cursor-pointer" href="/profile">
+                <Link
+                  className="cursor-pointer"
+                  href="/profile"
+                  title="Profile"
+                >
                   <div className="h-12 w-12">
                     {!preview ? (
                       <svg
@@ -484,7 +510,7 @@ const Dashboard = () => {
                     )}
                   </div>
                 </Link>
-                <div className="h-10 w-12" onClick={logout}>
+                <div className="h-10 w-12" onClick={logout} title="">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-full w-full cursor-pointer"
@@ -531,7 +557,7 @@ const Dashboard = () => {
                     ) : (
                       <div className="flex flex-row items-center justify-between">
                         {teamName}
-                        {isLeader ? (
+                        {/* {isLeader ? (
                           <a
                             className="cursor-pointer"
                             onClick={handleEditClick}
@@ -544,9 +570,10 @@ const Dashboard = () => {
                           </a>
                         ) : (
                           <></>
-                        )}
+                        )} */}
                       </div>
-                    )}
+                    )
+                    }
                   </div>
                 </div>
                 <div>{items}</div>
@@ -597,7 +624,7 @@ const Dashboard = () => {
                       exit={{ opacity: 0 }}
                     >
                       <motion.div
-                        className="rounded-lg bg-[#242E42] p-8"
+                        className="rounded-lg bg-[#242E42] p-8 "
                         initial={{ y: "-100vh" }}
                         animate={{ y: 0 }}
                         exit={{ y: "-100vh" }}
@@ -611,7 +638,7 @@ const Dashboard = () => {
                               className="mb-2 block text-white"
                               htmlFor="team-name"
                             >
-                              Team Name
+                              Team Name (Max 15 characters)
                             </label>
                             <input
                               className="w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2 font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#37ABBC]"
@@ -659,7 +686,7 @@ const Dashboard = () => {
                     >
                       Create Team
                     </button>
-                    <p className="py-1 pl-1 text-white">Become leader!</p>
+                    <p className="py-1 pl-1 text-white">Become a leader!</p>
                   </div>
                   <div className="w-36"></div>
                   <div className="flex flex-col items-center justify-center py-3">

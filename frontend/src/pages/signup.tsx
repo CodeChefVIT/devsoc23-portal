@@ -17,7 +17,7 @@ import "react-phone-input-2/lib/style.css";
 export default function Home() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVITian, setIsVITian] = useState(false);
+  const [isVITian, setIsVITian] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -92,7 +92,8 @@ export default function Home() {
           invalid_type_error: "Github Account must be a string",
         })
         .url({ message: "Please enter a valid url" })
-        .includes("github.com", { message: "Please enter a github link" }),
+        .includes("github.com", { message: "Please enter a github link" })
+        .or(z.string().regex(/^NA$/)),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
@@ -143,7 +144,7 @@ export default function Home() {
         setIsSubmitting(false);
         setIsSuccess(true);
         setIsOpen(true);
-        setMessage("Signed up successfully!");
+        setMessage("Signed up successfully! Please verify your email.");
         setTimeout(() => {
           setIsOpen(false);
         }, 2000);
@@ -173,10 +174,10 @@ export default function Home() {
     if (formik.values.college === "VIT Vellore") {
       setIsVITian(true);
       setIsOtherCollege(false);
-      void formik.setFieldValue("mode", "offline");
     } else if (formik.values.college === "Others") {
       setIsVITian(false);
       setIsOtherCollege(true);
+      void formik.setFieldValue("mode", "online");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.college]);
@@ -186,8 +187,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Sign Up</title>
-        <meta name="description" content="DevSoc'23 Sign Up Page" />
+        <title>DEVSOC&apos;23 | Sign Up</title>
+        <meta name="description" content="DEVSOC'23 Sign Up Page" />
         <link rel="icon" href="/devsoc.png" id="favicon" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -316,35 +317,6 @@ export default function Home() {
 
                 <div className="sm:col-span-3">
                   <label
-                    htmlFor="password"
-                    className="block text-sm font-medium leading-6 text-white"
-                  >
-                    Password
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      autoComplete="password"
-                      value={values.password}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      placeholder="Password"
-                      className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
-                        touched.password && errors.password
-                          ? "ring-2 ring-inset ring-red-500"
-                          : ""
-                      } `}
-                    />
-                    <span className="text-sm text-red-500">
-                      {touched.password && errors.password}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
                     htmlFor="phoneNumber"
                     className="block text-sm font-medium leading-6 text-white"
                   >
@@ -373,6 +345,35 @@ export default function Home() {
 
                     <span className="text-sm text-red-500">
                       {touched.phoneNumber && errors.phoneNumber}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium leading-6 text-white"
+                  >
+                    Password
+                  </label>
+                  <div className="mt-2">
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      autoComplete="password"
+                      value={values.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="Password"
+                      className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 ${
+                        touched.password && errors.password
+                          ? "ring-2 ring-inset ring-red-500"
+                          : ""
+                      } `}
+                    />
+                    <span className="text-sm text-red-500">
+                      {touched.password && errors.password}
                     </span>
                   </div>
                 </div>
@@ -484,7 +485,7 @@ export default function Home() {
                     htmlFor="github"
                     className="block text-sm font-medium leading-6 text-white"
                   >
-                    GitHub Profile
+                    GitHub Profile (Enter NA if not applicable)
                   </label>
                   <div className="mt-2">
                     <input
@@ -520,7 +521,7 @@ export default function Home() {
                       id="bio"
                       name="bio"
                       rows={3}
-                      placeholder="Write a few setences about yourself"
+                      placeholder="Write a few sentences about yourself"
                       value={values.bio}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -596,7 +597,7 @@ export default function Home() {
                   </label>
                   <div className="mt-2">
                     <select
-                      disabled={isVITian}
+                      disabled={!isVITian}
                       id="mode"
                       name="mode"
                       required
@@ -706,7 +707,7 @@ export default function Home() {
                   className="flex-shrink-0"
                   onClick={() => {
                     setIsOpen(false);
-                    console.log(values.phoneNumber);
+                    // console.log(values.phoneNumber);
                   }}
                 >
                   <svg
