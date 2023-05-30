@@ -69,6 +69,7 @@ const Dashboard = () => {
   const [preview, setPreview] = useState<StaticImageData | string | undefined>(
     ""
   );
+
   let token: string | undefined = "";
 
   const handleEditClick = () => {
@@ -370,10 +371,10 @@ const Dashboard = () => {
   //   }
   // };
 
-  const logout = () =>{
+  const logout = () => {
     localStorage.clear();
     void Router.push("/signin");
-  }
+  };
 
   const handleCreateTeam = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -415,7 +416,7 @@ const Dashboard = () => {
       } catch (err) {
         setIsSnackbarOpen(true);
         setIsSuccess(false);
-        setTextCreate("Create")
+        setTextCreate("Create");
         if (axios.isAxiosError(err)) {
           const error = err as AxiosError<ServerResponse>;
           if (error.response?.data.err === "User not found") {
@@ -501,7 +502,7 @@ const Dashboard = () => {
           </div>
 
           <div className="mx-0 flex w-full flex-col px-5 pb-16 pt-16  md:mx-0 md:w-full md:items-center md:px-10 lg:mx-0 lg:w-full lg:items-center lg:px-20">
-            <h1 className="pb-10 text-4xl font-bold text-white text-center">
+            <h1 className="pb-10 text-center text-4xl font-bold text-white">
               Team Information
             </h1>
             {hasTeam ? (

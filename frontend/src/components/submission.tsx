@@ -6,11 +6,47 @@ import Loader from "~/components/Loader";
 import { type ServerResponse } from "types/api";
 import Router from "next/router";
 
+interface TimeLeft {
+  days?: number;
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+}
+
 const Submission = () => {
   const [loading, setLoading] = useState(true);
   const [ideaName, setIdeaName] = useState("");
   const [ideaDesc, setIdeaDesc] = useState("");
   const router = useRouter();
+
+  const calculateTimeLeft = () => {
+    const year = new Date().getFullYear();
+
+    const difference = +new Date(`06/02/${year}`) - +new Date();
+
+    let timeLeft: TimeLeft = {};
+
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timeLeft;
+  };
+
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  });
 
   useEffect(() => {
     const getProject = async () => {
@@ -66,34 +102,40 @@ const Submission = () => {
                   Idea Submission
                 </p>
               </div>
-
-              {/* countdown  */}
-              {/* <div className="flex gap-5 py-4">
-                <div>
-                  <span className="countdown font-mono text-4xl ">
-                    <span>15</span>
+              <div className="flex gap-5 py-4">
+                <div className="flex flex-row items-end gap-2">
+                  <span className="font-mono text-4xl ">
+                    <span>
+                      <p>{timeLeft.days}</p>
+                    </span>
                   </span>
-                  days
+                  <p>days</p>
                 </div>
-                <div>
-                  <span className="countdown font-mono text-4xl">
-                    <span style={{ "--value": 10 }}></span>
+                <div className="flex flex-row items-end gap-2">
+                  <span className="font-mono text-4xl ">
+                    <span>
+                      <p>{timeLeft.hours}</p>
+                    </span>
                   </span>
-                  hours
+                  <p>hours</p>
                 </div>
-                <div>
-                  <span className="countdown font-mono text-4xl">
-                    <span style={{ "--value": 24 }}></span>
+                <div className="flex flex-row items-end gap-2">
+                  <span className="font-mono text-4xl ">
+                    <span>
+                      <p>{timeLeft.minutes}</p>
+                    </span>
                   </span>
-                  min
+                  <p>minutes</p>
                 </div>
-                <div>
-                  <span className="countdown font-mono text-4xl">
-                    <span style={{ "--value": 54 }}></span>
+                <div className="flex flex-row items-end gap-2">
+                  <span className="font-mono text-4xl ">
+                    <span>
+                      <p>{timeLeft.seconds}</p>
+                    </span>
                   </span>
-                  sec
+                  <p>seconds</p>
                 </div>
-              </div> */}
+              </div>
               <div className="flex w-full flex-col rounded-2xl bg-[#2F3B52] p-5">
                 <div className="inset-0 flex flex-col rounded-2xl bg-[#20293C] px-5 py-5">
                   <p className="w-fit text-lg font-bold text-[#61BFE7] md:text-xl lg:text-xl">
