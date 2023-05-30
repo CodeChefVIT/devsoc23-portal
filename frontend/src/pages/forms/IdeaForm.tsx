@@ -74,9 +74,13 @@ const IdeaForm = () => {
       })
       .max(15, { message: "Project name cannot be more than 15 characters" }),
     projectTrack: z
-      .literal("Finance")
-      .or(z.literal("Healthcare"))
-      .or(z.literal("Track 3")),
+      .literal("Amantya")
+      .or(z.literal("Blockchain"))
+      .or(z.literal("open Innovation"))
+      .or(z.literal("Automation Tools"))
+      .or(z.literal("Health and Wellness"))
+      .or(z.literal("Social Good"))
+      .or(z.literal("AR/VR")),
     projectDescription: z
       .string({
         required_error: "Project description is required",
@@ -179,7 +183,7 @@ const IdeaForm = () => {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Idea Submission</title>
+        <title>DEVSOC&apos;23 | Idea Submission</title>
         <meta name="description" content="Idea Submission for DEVSOC'23" />
         <link rel="icon" href="/devsoc.png" id="favicon" />
       </Head>
@@ -253,9 +257,13 @@ const IdeaForm = () => {
                     }`}
                   >
                     <option disabled>Select a track</option>
-                    <option>Finance</option>
-                    <option>Healthcare</option>
-                    <option>Track 3</option>
+                    <option value="AR/VR">AR/VR + Game Dev</option>
+                    <option value="Automation Tools">Automation Tools</option>
+                    <option value="Blockchain">Blockchain</option>
+                    <option value="Health and Wellness">Health and Wellness</option>
+                    <option value="Social Good">Social Good</option>
+                    <option value="open Innovation">Open Innovation</option>
+                    <option value="Amantya">Sponsored Track: Levaraging 5G for Smart Cities </option>
                   </select>
                 </div>
                 <label htmlFor="projectTrack" className="text-sm text-red-500">

@@ -78,6 +78,7 @@ export default function Home() {
         setIsSuccess(true);
         setIsOpen(true);
         setMessage("Password changed successfully!");
+        localStorage.clear();
         setTimeout(() => {
           setIsOpen(false);
         }, 2000);
@@ -119,8 +120,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Set New Password</title>
-        <meta name="description" content="DevSoc'23 Set New Password Page" />
+        <title>DEVSOC&apos;23 | Set New Password</title>
+        <meta name="description" content="DEVSOC'23 Set New Password Page" />
         <link rel="icon" href="/devsoc.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />

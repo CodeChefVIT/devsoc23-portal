@@ -32,14 +32,14 @@ const getToken = async (): Promise<string | undefined> => {
         },
       }
     );
-    console.log(data);
+    // console.log(data);
     if (data.status === "true") {
       return data.accessToken;
     } else {
       void Router.push("/signin");
     }
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     void Router.push("/signin");
   }
 };

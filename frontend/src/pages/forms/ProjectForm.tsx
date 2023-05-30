@@ -202,7 +202,7 @@ const ProjectForm = () => {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Project Submission</title>
+        <title>DEVSOC&apos;23 | Project Submission</title>
         <meta name="description" content="Project Submission for DEVSOC'23" />
         <link rel="icon" href="/devsoc.png" id="favicon" />
       </Head>
@@ -470,7 +470,7 @@ const ProjectForm = () => {
                 </label>
                 <p className="mt-2 pb-1 text-sm text-gray-300">
                   Make sure to give viewing permissions (Enter NA if not
-                  available).
+                  applicable).
                 </p>
                 <div className="mt-2 flex rounded-lg shadow-sm">
                   <input
@@ -548,7 +548,7 @@ const ProjectForm = () => {
                 </label>
                 <p className="mt-2 pb-1 text-sm text-gray-300">
                   Upload everything to a Google Drive folder and share the link
-                  (Enter NA if not available).
+                  (Enter NA if not applicable).
                 </p>
                 <div className="mt-2 flex rounded-lg shadow-sm">
                   <input

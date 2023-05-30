@@ -117,7 +117,7 @@ function Profile() {
         required_error: "Required",
         invalid_type_error: "Bio must be a string",
       })
-      .min(100, "Bio must have min 100 chars")
+      .min(40, "Bio must have min 40 chars")
       .max(500, "Bio must have max 500 chars"),
     college: z.literal("VIT Vellore").or(z.literal("Others")),
     birthDate: z
@@ -136,7 +136,8 @@ function Profile() {
         invalid_type_error: "Github Account must be a string",
       })
       .url({ message: "Please enter a valid url" })
-      .includes("github.com", { message: "Please enter a github link" }),
+      .includes("github.com", { message: "Please enter a github link" })
+      .or(z.string().regex(/^NA$/)),
   });
 
   const formik = useFormik({
@@ -187,15 +188,15 @@ function Profile() {
         values.birthDate = data.user.birthDate;
         values.mode = data.user.mode;
         values.github = data.user.github;
-        console.log(data.user.image);
+        // console.log(data.user.image);
         setPreview(data.user.image);
         if (values.college === "VIT Vellore") {
           setIsVITian(true);
-          values.mode = "offline";
         } else {
           setIsVITian(false);
           values.college = "Others";
           setIsOtherCollege(true);
+          values.mode = "online";
           values.otherCollege = data.user.college;
         }
         void formik.setValues(values);
@@ -371,10 +372,10 @@ function Profile() {
     if (formik.values.college === "VIT Vellore") {
       setIsVITian(true);
       setIsOtherCollege(false);
-      void formik.setFieldValue("mode", "offline");
     } else if (formik.values.college === "Others") {
       setIsVITian(false);
       setIsOtherCollege(true);
+      void formik.setFieldValue("mode", "online");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.college]);
@@ -386,8 +387,8 @@ function Profile() {
   return (
     <>
       <Head>
-        <title>DEVSoC&apos;23 | Profile</title>
-        <meta name="description" content="DevSoc'23 Sign Up Page" />
+        <title>DEVSOC&apos;23 | Profile</title>
+        <meta name="description" content="DEVSOC'23 Sign Up Page" />
         <link rel="icon" href="/devsoc.png" />
       </Head>
       {loading && (
@@ -651,7 +652,7 @@ function Profile() {
                       htmlFor="github"
                       className="block text-sm font-medium leading-6 text-white"
                     >
-                      GitHub Profile
+                      GitHub Profile (Enter NA if not applicable)
                     </label>
                     <div className="mt-2">
                       <input
@@ -757,7 +758,7 @@ function Profile() {
                     </label>
                     <div className="mt-2">
                       <select
-                        disabled={isVITian}
+                        disabled={!isVITian}
                         id="mode"
                         name="mode"
                         value={values.mode}
