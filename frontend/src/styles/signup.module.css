@@ -1,171 +1,441 @@
-.maincontainer{
-    display: flex;
-    justify-content: space-between;
+.maincontainer {
+  display: flex;
+  justify-content: space-between;
+  scroll-behavior: smooth;
 }
-.leftcontainer{
-    border-left-width: 5px;
-    border-left-color: rgb(0, 150, 136);
-    background-color: #242E42;
-    width: 65%;
+.leftcontainer {
+  border-left-width: 5px;
+  border-left-color: rgb(0, 150, 136);
+  background-color: #242e42;
+  width: 65%;
 }
-.devsoclogo{
-    margin: 1rem;
-    height: 4.5rem;
-    width: 4.5rem;
+.devsoclogo {
+  margin: 1rem;
+  height: 4.5rem;
+  width: 4.5rem;
 }
 .leftcontainer > h1 {
-    margin-top: 1rem;
-    margin-left: 8rem;
-    color: white;
-    font-weight: bold;
-    font-size: 50px;
+  margin-top: 1rem;
+  margin-left: 8rem;
+  color: white;
+  font-weight: bold;
+  font-size: 50px;
 }
 .leftcontainer > h6 {
-    margin-left: 8rem;
-    color: white;
-    font-weight: 200;
-    font-size: 30px;
+  margin-left: 8rem;
+  color: white;
+  font-weight: 200;
+  font-size: 30px;
 }
-.formcontainer{
-    display: flex;
-    flex-direction: column;
+.namescontainerform {
+  display: flex;
+  flex-direction: row;
+  margin-top: 3rem;
 }
-.formcontainer > label {
-    margin-top: 1rem;
-    margin-left: 8rem;
-    color: white;
-    font-weight: 100;
-    font-size: 20px;
+.biocontainer,
+.gendercontainer,
+.phonenumbercontainer {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
 }
-.formcontainer > input {
-    border-radius: 10px;
-    height: 2.4rem;
-    width: 30rem;
-    margin-left: 8rem;
-    margin-top: 0.2rem;
-    padding: 0.8rem;
+.personaldetailscontainer,
+.emailpasswordcontainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1rem;
+}
+.firstnamelabel,
+.emaillabel,
+.biolabel,
+.genderlabel,
+.collegenamelabel,
+.phonelabel {
+  margin-left: 8rem;
+  color: white;
+  font-weight: 100;
+  font-size: 20px;
+}
+.lastnamelabel,
+.passwordlabel {
+  color: white;
+  font-weight: 100;
+  font-size: 20px;
+  margin-left: 2rem;
+}
+.educationlabel {
+  margin-left: 8rem;
+  color: white;
+  font-weight: 100;
+  font-size: 20px;
+  margin-top: 1rem;
+}
+.birthdaylabel {
+  color: white;
+  font-weight: 100;
+  font-size: 20px;
+  margin-left: 2rem;
+}
+.firstnameinput,
+.emailinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  color: black;
+  margin-left: 8rem;
+}
+.lastnameinput,
+.passwordinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  margin-left: 2rem;
+  color: black;
+}
+.phonenumberinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+}
+.phonenumberinput::-webkit-outer-spin-button,
+.phonenumberinput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.errorphonenumberinput::-webkit-outer-spin-button,
+.errorphonenumberinput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.bioinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 42rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  color: black;
+}
+.genderinput {
+  border-radius: 10px;
+  height: fit-content;
+  width: 12rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  color: black;
+}
+.collegenameinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 15rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  color: black;
+}
+.birthdayinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 15rem;
+  padding: 0.8rem;
+  margin-left: 2rem;
+  color: black;
+}
+.errorfirstnameinput,
+.erroremailinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  border: solid red 2px;
+  color: black;
+}
+.errorlastnameinput,
+.errorpasswordinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  border: solid red 2px;
+  margin-left: 2rem;
+  color: black;
+}
+.errorphonenumberinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 20rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  border: solid red 2px;
+  color: black;
+}
+.errorbioinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 42rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  border: solid red 2px;
+  color: black;
+}
+.errorgenderinput {
+  border-radius: 10px;
+  height: fit-content;
+  width: 12rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  border: solid red 2px;
+  color: black;
+}
+.errorcollegenameinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 15rem;
+  padding: 0.8rem;
+  margin-left: 8rem;
+  border: solid red 2px;
+  color: black;
+}
+.errorbirthdayinput {
+  border-radius: 10px;
+  height: 2.4rem;
+  width: 15rem;
+  padding: 0.8rem;
+  margin-left: 2rem;
+  border: solid red 2px;
+  color: black;
 }
 .formcontainer > button {
-    display: flex;
-    justify-content: center;
-    margin-left: 8rem;
-    margin-top: 1.2rem;
-    border-radius: 10px;
-    padding: 0.3rem;
-    width: 13rem;
-    height: 2.1rem;
-}
-.googlesignincontainer{
-    display: flex;
-    flex-direction: column;
-}
-.googlesignincontainer > span {
-    margin-left: 8rem;
-    margin-top: 1.4rem;
-    color: white;
-    font-size: 18px;
-}
-.googlesignincontainer > button {
-    display: flex;
-    justify-content: center;
-    margin-left: 8rem;
-    margin-top: 0.8rem;
-    border-radius: 10px;
-    padding: 0.2rem;
-    width: 13rem;
+  display: flex;
+  justify-content: center;
+  margin-left: 8rem;
+  margin-top: 2rem;
+  border-radius: 10px;
+  padding: 0.3rem;
+  width: 13rem;
+  height: 2.1rem;
+  margin-bottom: 1rem;
 }
 .rightcontainer {
-    background-color: #20293C;
-    width: 35%;
-    overflow: hidden;
-    height: 100vh;
+  background-color: #20293c;
+  width: 35%;
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  left: 65%;
 }
-.saturn{
-    opacity: 40%;
-    rotate: -12deg;
-    width: 16rem;
-    height: 16rem;
-    position: relative;
-    bottom: 100px;
-    left: 30px;
+.saturn {
+  opacity: 40%;
+  rotate: -12deg;
+  width: 16rem;
+  height: 16rem;
+  position: relative;
+  bottom: 100px;
+  left: 30px;
 }
-.stars{
-    position: relative;
-    bottom: 250px;
-    width: 96rem;
-    right: 30px;
+.stars {
+  position: relative;
+  bottom: 250px;
+  width: 96rem;
+  right: 30px;
 }
-.astro{
-    transform: scaleX(-1);
-    height: 35rem;
-    width: 35rem;
-    position: relative;
-    bottom: 1150px;
-    left: 150px;
-    opacity: 100%;
+.astro {
+  transform: scaleX(-1);
+  height: 35rem;
+  width: 35rem;
+  position: relative;
+  bottom: 1150px;
+  left: 150px;
+  opacity: 100%;
 }
-.mars{
-    position: relative;
-    bottom: 1190px;
-    opacity: 40%;
-    left: 380px;
-    width: 16rem;
-    height: 16rem;
+.mars {
+  position: relative;
+  bottom: 1190px;
+  opacity: 40%;
+  left: 380px;
+  width: 16rem;
+  height: 16rem;
 }
 
 @media only screen and (max-width: 1400px) {
-    .maincontainer{
-        display: block;
-    }
-    .leftcontainer{
-        width: 100%;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .devsoclogo{
-        margin: 0.5rem;
-    }
-    .leftcontainer > h1 {
-        margin: 0;
-        font-size: 200%;
-    }
-    .leftcontainer > h6 {
-        margin: 0;
-        font-size: 120%;
-    }
-    .formcontainer{
-        align-items: center;
-    }
-    .formcontainer > label {
-        margin-top: 2%;
-        margin-left: 0;
-        font-size: 150%;
-    }
-    .formcontainer > input {
-        width: 20rem;
-        margin: 0;
-    }
-    .formcontainer > button {
-        margin-left: 0;
-    }
-    .googlesignincontainer{
-        align-items: center;
-    }
-    .googlesignincontainer > span {
-        margin-left: 0;
-    }
-    .googlesignincontainer > button {
-        margin-left: 0;
-    }
-    .rightcontainer{
-        display: none;
-    }
+  .maincontainer {
+    display: block;
   }
-  @media only screen and (max-height: 575px) {
-    .leftcontainer{
-        height: fit-content;
-    }
+  .leftcontainer {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .devsoclogo {
+    margin: 0.5rem;
+  }
+  .leftcontainer > h1 {
+    margin: 0;
+    font-size: 200%;
+  }
+  .leftcontainer > h6 {
+    margin: 0;
+    font-size: 120%;
+  }
+  .formcontainer {
+    display: flex;
+    flex-direction: column;
+  }
+  .namescontainerform {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    margin-top: 0rem;
+  }
+  .biocontainer,
+  .gendercontainer,
+  .phonenumbercontainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0rem;
+    align-content: center;
+  }
+  .personaldetailscontainer,
+  .emailpasswordcontainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0rem;
+    align-content: center;
+  }
+  .firstnamelabel,
+  .emaillabel,
+  .biolabel,
+  .genderlabel,
+  .collegenamelabel,
+  .phonelabel {
+    margin-left: 0rem;
+    align-self: center;
+    margin-top: 1rem;
+  }
+  .lastnamelabel,
+  .passwordlabel {
+    margin-left: 0rem;
+    align-self: center;
+    margin-top: 1rem;
+  }
+  .educationlabel {
+    margin-left: 0rem;
+    margin-top: 0rem;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  .birthdaylabel {
+    margin-top: 0rem;
+    margin-left: 0rem;
+    align-self: center;
+    margin-top: 1rem;
+  }
+  .firstnameinput,
+  .emailinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .lastnameinput,
+  .passwordinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .phonenumberinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .bioinput {
+    margin-left: 0rem;
+    width: 20rem;
+    align-self: center;
+    color: black;
+  }
+  .genderinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .collegenameinput {
+    width: 20rem;
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .birthdayinput {
+    width: 20rem;
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorfirstnameinput,
+  .erroremailinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorlastnameinput,
+  .errorpasswordinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorphonenumberinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorbioinput {
+    width: 20rem;
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorgenderinput {
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorcollegenameinput {
+    width: 20rem;
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .errorbirthdayinput {
+    width: 20rem;
+    margin-left: 0rem;
+    align-self: center;
+    color: black;
+  }
+  .formcontainer > button {
+    margin-left: 0rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+  }
+  .rightcontainer {
+    display: none;
+  }
+}
+@media only screen and (max-height: 420px) {
+  .leftcontainer {
+    height: fit-content;
+  }
+}
+@media only screen and (max-height: 1100px) {
+  .leftcontainer {
+    height: 100%;
+  }
 }
