@@ -22,7 +22,7 @@ const Submission = () => {
   const calculateTimeLeft = () => {
     const year = new Date().getFullYear();
 
-    const difference = +new Date(`${year}-06-02T06:00:00`) - +new Date();
+    const difference = +new Date(`${year}-06-02T04:00:00`) - +new Date();
 
     let timeLeft: TimeLeft = {};
 
