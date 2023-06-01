@@ -4,7 +4,7 @@
 <h2 align="center"> Project Title </h2>
 <br/>
 
-> Include project description here.
+> Include project description here
 
 ---
 
