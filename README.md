@@ -22,7 +22,7 @@
 <img src="https://i.ibb.co/VppxmWZ/cet.png" alt="Common-Entry-Test" width="400px"/>
 </p>
 
-## Dependencies
+## Dependenciess
 
 - < dependency >
 - < dependency >
