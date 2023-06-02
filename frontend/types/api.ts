@@ -10,6 +10,7 @@ interface User {
   mode: string;
   github: string;
   image: string;
+  regNo: string;
 }
 
 interface Project {
@@ -46,6 +47,7 @@ interface ServerResponse {
   teamName: string;
   teamId: string;
   teamLeader: string;
+  regNo: string;
 }
 
 export type { ServerResponse };
