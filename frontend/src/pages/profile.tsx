@@ -33,6 +33,7 @@ interface Values {
   mode: string;
   github: string;
   image: File | undefined;
+  regNo: string;
   otherCollege: string;
 }
 
@@ -51,6 +52,7 @@ function Profile() {
     github: "",
     image: undefined,
     otherCollege: "",
+    regNo: "",
   };
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -138,6 +140,15 @@ function Profile() {
       .url({ message: "Please enter a valid url" })
       .includes("github.com", { message: "Please enter a github link" })
       .or(z.string().regex(/^NA$/)),
+    regNo: z
+      .string({
+        required_error: "Required",
+        invalid_type_error: "Registration number must be a string",
+      })
+      .regex(
+        /^[0-9]{2}[A-Za-z]{3}[0-9]{4}$/,
+        "Enter a valid registration number"
+      ),
   });
 
   const formik = useFormik({
@@ -188,6 +199,7 @@ function Profile() {
         values.birthDate = data.user.birthDate;
         values.mode = data.user.mode;
         values.github = data.user.github;
+        values.regNo = data.user.regNo;
         // console.log(data.user.image);
         setPreview(data.user.image);
         if (values.college === "VIT Vellore") {
@@ -229,6 +241,7 @@ function Profile() {
     birthDate: string;
     mode: string;
     github: string;
+    regNo: string;
     image: File | undefined;
   }) => {
     if (!process.env.NEXT_PUBLIC_SERVER_URL) return;
@@ -812,6 +825,38 @@ function Profile() {
 
                         <span className="text-sm text-red-500">
                           {touched.otherCollege && errors.otherCollege}
+                        </span>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {isVITian ? (
+                    <div className="sm:col-span-6">
+                      <label
+                        htmlFor="regNo"
+                        className="block text-sm font-medium leading-6 text-white"
+                      >
+                        Registration Number
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="regNo"
+                          id="regNO"
+                          value={values.regNo}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          placeholder="Registration Number"
+                          className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#37ABBC] sm:text-sm sm:leading-6 
+                      ${
+                        touched.regNo && errors.regNo
+                          ? "ring-2 ring-inset ring-red-500"
+                          : ""
+                      }`}
+                        />
+
+                        <span className="text-sm text-red-500">
+                          {touched.regNo && errors.regNo}
                         </span>
                       </div>
                     </div>

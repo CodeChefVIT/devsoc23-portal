@@ -582,7 +582,7 @@ const Dashboard = () => {
                 </div>
                 <div>{items}</div>
                 <div className="flex w-full flex-col items-center justify-between md:flex-row lg:flex-row">
-                  <div className="flex flex-col items-center py-3">
+                  {/* <div className="flex flex-col items-center py-3">
                     <Tooltip
                       content={"Copied to Clipboard"}
                       trigger="click"
@@ -599,7 +599,7 @@ const Dashboard = () => {
                     <p className="py-1 text-white">
                       Use this code to invite people
                     </p>
-                  </div>
+                  </div> */}
                   <div className="w-10"></div>
                   <div className="py-7">
                     <button onClick={handleLeaveTeam}>
@@ -619,7 +619,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="rounded-2xl bg-[#2F3B52] py-10 pl-5 pr-6 md:px-10 lg:px-10">
-                <AnimatePresence>
+                {/* <AnimatePresence>
                   {isOpen && (
                     <motion.div
                       className="fixed bottom-0 left-0 right-0 top-0 z-30 flex items-center justify-center bg-gray-500 bg-opacity-50"
@@ -677,11 +677,11 @@ const Dashboard = () => {
                       </motion.div>
                     </motion.div>
                   )}
-                </AnimatePresence>
+                </AnimatePresence> */}
                 <p className="py-3 text-xl font-bold text-white">
-                  Sorry you are not in any team!
+                  Sorry you cannot create a team now!
                 </p>
-                <div className="flex flex-col justify-between md:flex-row lg:flex-row">
+                {/* <div className="flex flex-col justify-between md:flex-row lg:flex-row">
                   <div className="flex flex-col items-center justify-center py-3">
                     <button
                       type="button"
@@ -706,7 +706,7 @@ const Dashboard = () => {
                     />
                     <p className="py-1 pl-1 text-white">{joinTeam}</p>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
           </div>
