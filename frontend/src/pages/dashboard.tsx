@@ -1,8 +1,8 @@
 import Head from "next/head";
 import Image, { type StaticImageData } from "next/image";
 import { useState, useEffect, type ReactNode } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-// import { Tooltip } from "@nextui-org/react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip } from "@nextui-org/react";
 import { HiCheck } from "react-icons/hi";
 
 import Devsoc from "./../../assets/logo.png";
