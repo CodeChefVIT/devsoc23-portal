@@ -19,10 +19,10 @@ const Submission = () => {
   const [ideaDesc, setIdeaDesc] = useState("");
   const router = useRouter();
 
-  const calculateTimeLeft = () => {
+  const calculateTimeLeftIdea = () => {
     const year = new Date().getFullYear();
 
-    const difference = +new Date(`${year}-06-04T06:00:00`) - +new Date();
+    const difference = +new Date(`${year}-06-13T06:00:00`) - +new Date();
 
     let timeLeft: TimeLeft = {};
 
@@ -38,11 +38,32 @@ const Submission = () => {
     return timeLeft;
   };
 
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(calculateTimeLeft());
+  const calculateTimeLeftProject = () => {
+    const year = new Date().getFullYear();
+
+    const difference = +new Date(`${year}-06-15T06:00:00`) - +new Date();
+
+    let timeLeft: TimeLeft = {};
+
+    if (difference > 0) {
+      timeLeft = {
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60),
+      };
+    }
+
+    return timeLeft;
+  };
+
+  const [timeLeftIdea, setTimeLeftIdea] = useState<TimeLeft>(calculateTimeLeftIdea());
+  const [timeLeftProject, setTimeLeftProject] = useState<TimeLeft>(calculateTimeLeftProject());
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setTimeLeft(calculateTimeLeft());
+      setTimeLeftIdea(calculateTimeLeftIdea());
+      setTimeLeftProject(calculateTimeLeftProject());
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -97,17 +118,17 @@ const Submission = () => {
           <div className="mx-0 flex flex-col px-5 pb-16 md:mx-0 md:w-full md:items-center md:px-10 lg:mx-0 lg:w-full lg:items-center lg:px-20 ">
             <h1 className="pt-5 text-4xl font-bold text-white ">Submission</h1>
             <div className="px-30 w-full">
-              {/* <div className="flex w-full flex-col items-start justify-between px-0 md:flex-row lg:flex-row">
+              <div className="flex w-full flex-col items-start justify-between px-0 md:flex-row lg:flex-row">
                 <p className="pb-3 pt-8 text-2xl font-bold text-white">
-                  Idea Submitted
+                  Idea Submission
                 </p>
               </div>
               <div className="flex flex-wrap gap-5 py-4">
-                {timeLeft.days === 0 ? null : (
+                {timeLeftIdea.days === 0 ? null : (
                   <div className="flex flex-row items-end gap-2">
                     <span className="font-mono text-4xl ">
                       <span>
-                        <p>{timeLeft.days}</p>
+                        <p>{timeLeftIdea.days}</p>
                       </span>
                     </span>
                     <p>days</p>
@@ -116,7 +137,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.hours}</p>
+                      <p>{timeLeftIdea.hours}</p>
                     </span>
                   </span>
                   <p>hours</p>
@@ -124,7 +145,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.minutes}</p>
+                      <p>{timeLeftIdea.minutes}</p>
                     </span>
                   </span>
                   <p>minutes</p>
@@ -132,7 +153,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.seconds}</p>
+                      <p>{timeLeftIdea.seconds}</p>
                     </span>
                   </span>
                   <p>seconds</p>
@@ -148,7 +169,7 @@ const Submission = () => {
                   <p className="break-all pt-5">
                     {ideaDesc === "" ? "" : `${ideaDesc}...`}
                   </p>
-                  {/* <p className="block md:hidden">{ideaDescMob === "" ? "" : `${ideaDescMob}...`}</p> 
+                  {/* <p className="block md:hidden">{ideaDescMob === "" ? "" : `${ideaDescMob}...`}</p>  */}
                  </div> 
                 <button
                   type="button"
@@ -159,20 +180,20 @@ const Submission = () => {
                 >
                   {ideaName === "" ? "Submit an idea" : "Edit your idea"}
                 </button> 
-              </div> */}
+              </div>
 
 
-              <div className="flex w-full flex-col items-start justify-between px-0 md:flex-row lg:flex-row mt-10">
+              {/* <div className="flex w-full flex-col items-start justify-between px-0 md:flex-row lg:flex-row mt-10">
                 <p className="pb-3 pt-8 text-2xl font-bold text-white">
                   Project Submission
                 </p>
               </div>
               <div className="flex flex-wrap gap-5 py-4">
-                {timeLeft.days === 0 ? null : (
+                {timeLeftProject.days === 0 ? null : (
                   <div className="flex flex-row items-end gap-2">
                     <span className="font-mono text-4xl ">
                       <span>
-                        <p>{timeLeft.days}</p>
+                        <p>{timeLeftProject.days}</p>
                       </span>
                     </span>
                     <p>days</p>
@@ -181,7 +202,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.hours}</p>
+                      <p>{timeLeftProject.hours}</p>
                     </span>
                   </span>
                   <p>hours</p>
@@ -189,7 +210,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.minutes}</p>
+                      <p>{timeLeftProject.minutes}</p>
                     </span>
                   </span>
                   <p>minutes</p>
@@ -197,7 +218,7 @@ const Submission = () => {
                 <div className="flex flex-row items-end gap-2">
                   <span className="font-mono text-4xl ">
                     <span>
-                      <p>{timeLeft.seconds}</p>
+                      <p>{timeLeftProject.seconds}</p>
                     </span>
                   </span>
                   <p>seconds</p>
@@ -223,7 +244,7 @@ const Submission = () => {
                 >
                   {ideaName === "" ? "Submit an idea" : "Modify your submission"}
                 </button>
-              </div>
+              </div> */}
 
 
             </div>
