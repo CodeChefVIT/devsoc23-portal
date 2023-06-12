@@ -14,6 +14,11 @@
 - Reduce redundancy.
 - Well updated and informative.
 - Easy to use.
+	
+## Important Links
+- [DEVSOC Landing Page](https://hackwith.codechefvit.com)
+- [DEVSOC Backend Repo](https://github.com/CodeChefVIT/devsoc23-backend)
+- [DEVSOC Landing Page Repo](https://github.com/CodeChefVIT/DEVSOC-23-Landing)
 
 ## Screenshots
 <p align="center">
