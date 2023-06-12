@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import { AiOutlineCloudUpload } from "react-icons/ai";
-import { IconContext } from "react-icons";
+import { IconContext } from "react-icons/lib";
 // import FormData from "form-data";
 import { useFormik } from "formik";
 // import { type Dayjs } from "dayjs";
