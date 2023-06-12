@@ -5,10 +5,10 @@
 
 > <Subtitle>
 > The offical portal for DEVSOC'23
-
+<!-- 
 ---
 [![DOCS](https://img.shields.io/badge/Documentation-see%20docs-green?style=flat-square&logo=appveyor)](INSERT_LINK_FOR_DOCS_HERE) 
-  [![UI ](https://img.shields.io/badge/User%20Interface-Link%20to%20UI-orange?style=flat-square&logo=appveyor)](INSERT_UI_LINK_HERE)
+  [![UI ](https://img.shields.io/badge/User%20Interface-Link%20to%20UI-orange?style=flat-square&logo=appveyor)](INSERT_UI_LINK_HERE) -->
 
 ## Features
 - Reduce redundancy.
@@ -22,12 +22,12 @@
 
 ## Screenshots
 <p align="center">
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%201.png" alt="Project Screenshots" height="400" >
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%202.png" alt="Project Screenshots" height="400" >
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%203.png" alt="Project Screenshots" height="400" >
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%204.png" alt="Project Screenshots" height="400" >
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%205.png" alt="Project Screenshots" height="400" >
-<img src="https://github.com/aditansh/devsoc23-portal/blob/test/Screenshots/Screenshot%206.png" alt="Project Screenshots" height="400" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%201.png" alt="Project Screenshots" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%202.png" alt="Project Screenshots" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%203.png" alt="Project Screenshots" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%204.png" alt="Project Screenshots" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%205.png" alt="Project Screenshots" >
+<img src="https://github.com/CodeChefVIT/devsoc23-portal/blob/test/Screenshots/Screenshot%206.png" alt="Project Screenshots" >
 </p>
 
 ## Instructions to run
