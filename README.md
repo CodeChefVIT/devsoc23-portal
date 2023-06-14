@@ -4,19 +4,23 @@
 # DEVSOC'23 Portal
 
 > <Subtitle>
-> The offical portal for DEVSOC'23
+> The official portal for DEVSOC'23
 <!-- 
 ---
 [![DOCS](https://img.shields.io/badge/Documentation-see%20docs-green?style=flat-square&logo=appveyor)](INSERT_LINK_FOR_DOCS_HERE) 
   [![UI ](https://img.shields.io/badge/User%20Interface-Link%20to%20UI-orange?style=flat-square&logo=appveyor)](INSERT_UI_LINK_HERE) -->
 
 ## Features
+- Signup/Login
+- Create team
+- Join team using code/leave team
+- Update profile
+- Submit idea & submit project
 - Reduce redundancy.
-- Well updated and informative.
 - Easy to use.
 	
 ## Important Links
-- [DEVSOC Landing Page](https://hackwith.codechefvit.com)
+- [DEVSOC Landing Page](https://devsoc.codechefvit.com/)
 - [DEVSOC Backend Repo](https://github.com/CodeChefVIT/devsoc23-backend)
 - [DEVSOC Landing Page Repo](https://github.com/CodeChefVIT/DEVSOC-23-Landing)
 
@@ -34,6 +38,7 @@
 ```
 $ git clone https://github.com/CodeChefVIT/devsoc23-portal.git
 $ cd devsoc23-portal
+$ cd frontend
 $ npm i
 $ npm run dev
 >> Refer .env.example for environment variables
